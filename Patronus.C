@@ -84,13 +84,16 @@ int main(int argc, char** argv)
     for ( int i = 0; i < contours.size(); i++ ) {
       drawContours(frame, contours, i, Scalar(0, 0, 255), 2, 8, hierarchy, 0, Point());
 
-      // Construct bounding ellipse
-      RotatedRect r = fitEllipse(contours[i]);
+      // TODO: Clean up, fitEllipse needs at least 5 points
+      if ( contours[i].size() > 5 ) {
+        // Construct bounding ellipse
+        RotatedRect r = fitEllipse(contours[i]);
 
-      float e = eccentricity(r);
-      if ( e < 0.8 ) {          // e = 0.8 corresponds to b = 0.6 * a
-        drawRotatedRect(frame, r, Scalar(0, 255, 0));
-        lights.push_back(r.center);
+        float e = eccentricity(r);
+        if ( e < 0.8 ) {          // e = 0.8 corresponds to b = 0.6 * a
+          drawRotatedRect(frame, r, Scalar(0, 255, 0));
+          lights.push_back(r.center);
+        }
       }
     }
 
