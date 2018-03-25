@@ -88,8 +88,6 @@ namespace Wand {
     }
 
     void run( bool debug = false ) {
-      cout << "RawInput::run" << endl;
-
       VideoCapture cap(0); // Open the default camera
       if(!cap.isOpened())
         return;
@@ -135,9 +133,7 @@ namespace Wand {
               lights.push_back(r.center);
 
               // TODO: Callback timestamp
-              cout << "here" << endl;
               callback(r.center.x / frame.cols, r.center.y / frame.rows, 0.);
-              cout << "woo" << endl;
             }
           }
         }

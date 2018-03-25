@@ -11,9 +11,12 @@ using std::thread;
 
 int main()
 {
-  sf::RenderWindow window(sf::VideoMode(200, 200), "SFML works!");
+  int width = 1280;
+  int height = 720;
 
-  sf::CircleShape shape(100.f);
+  sf::RenderWindow window(sf::VideoMode(width, height), "SFML works!");
+
+  sf::CircleShape shape(20.f);
 
   shape.setFillColor(sf::Color::Green);
 
@@ -52,9 +55,11 @@ int main()
 
     while ( wandInput.pollEvent(wandEvent) ) {
 
-      switch (wandEvent) {
-      case Wand::Jump:
-        shape.setFillColor(sf::Color::Red);
+      switch (wandEvent.type) {
+      case Wand::Event::WandPoint:
+
+        shape.setPosition(wandEvent.wandPoint.x * width, wandEvent.wandPoint.y * height);
+
         break;
 
       default:

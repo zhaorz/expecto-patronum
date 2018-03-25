@@ -20,8 +20,24 @@ using namespace std::placeholders;  // for _1, _2, _3...
 
 namespace Wand {
 
-  enum Event {
-    Jump,
+  class Event {
+  public:
+
+    struct WandPointEvent {
+      double x;
+      double y;
+    };
+
+    enum EventType {
+      WandPoint,
+    };
+
+    // Members
+    EventType type;
+
+    union {
+      WandPointEvent wandPoint;
+    };
   };
 
   class WandInput {
@@ -47,11 +63,9 @@ namespace Wand {
       std::cout << "WandInput::run" << std::endl;
       // TODO: Start running
 
-      std::this_thread::sleep_for(std::chrono::seconds(2));
+      // std::this_thread::sleep_for(std::chrono::seconds(2));
 
-      std::cout << "WandInput::run : dispatching event ..." << std::endl;
-
-      pushEvent( Jump );
+      // std::cout << "WandInput::run : dispatching event ..." << std::endl;
     }
 
     bool pollEvent( Event& event ) {
@@ -68,7 +82,12 @@ namespace Wand {
     }
 
     void rawInputCb (double x, double y, double t) {
-      std::cout << "WandInput : " << x << ", " << y << ", t = " << t << std::endl;
+      Event event;
+      event.type = Event::WandPoint;
+      event.wandPoint = { x, y };
+
+      pushEvent( event );
+
       return;
     };
 
