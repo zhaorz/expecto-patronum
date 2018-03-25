@@ -27,4 +27,4 @@ message(STATUS "    dependencies: ${SFML_DEPENDENCIES}")
 add_executable( Main Main.C )
 include_directories(${SFML_INCLUDE_DIR})
 
-target_link_libraries(Main ${SFML_LIBRARIES} ${SFML_DEPENDENCIES})
+target_link_libraries(Main ${OpenCV_LIBS} ${SFML_LIBRARIES} ${SFML_DEPENDENCIES})

@@ -3,14 +3,19 @@
 #include <iostream>
 
 #include <chrono>
+#include <functional>
 #include <mutex>
 #include <queue>
 #include <thread>
+
+#include "RawInput.H"
 
 
 using std::lock_guard;
 using std::mutex;
 using std::queue;
+using std::thread;
+using namespace std::placeholders;  // for _1, _2, _3...
 
 
 namespace Wand {
@@ -23,8 +28,15 @@ namespace Wand {
 
   public:
 
-    WandInput() : eventQueue() {
+    WandInput() : eventQueue(), rawInput() {
       std::cout << "WandInput : initializing ..." << std::endl;
+
+      RawInput::InputCb cb = std::bind(&WandInput::rawInputCb, this, _1, _2, _3);
+      rawInput.registerCallback(cb);
+
+      rawInputThread = thread([&] () { rawInput.run(); });
+
+      std::cout << "WandInput : initialized" << std::endl;
     }
 
     ~WandInput() {
@@ -55,6 +67,11 @@ namespace Wand {
       return true;
     }
 
+    void rawInputCb (double x, double y, double t) {
+      std::cout << "WandInput : " << x << ", " << y << ", t = " << t << std::endl;
+      return;
+    };
+
   private:
 
     void pushEvent( Event event ) {
@@ -67,6 +84,9 @@ namespace Wand {
 
     // TODO: Add locks
     queue<Event> eventQueue;
+
+    RawInput rawInput;
+    thread rawInputThread;
 
   };
 

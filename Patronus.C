@@ -32,6 +32,44 @@ float eccentricity(const RotatedRect& r)
   return std::sqrt(1. - (b * b) / (a * a));
 }
 
+double thresholdValue(Mat& image)
+{
+  int histSize = 256;
+
+  float range[] = { 0, 256 } ;
+  const float* histRange = { range };
+
+  bool uniform = true; bool accumulate = false;
+
+  Mat hist;
+
+  calcHist( &image, 1, 0, Mat(), hist, 1, &histSize, &histRange, uniform, accumulate );
+
+  int hist_w = 512; int hist_h = 400;
+  int bin_w = cvRound( (double) hist_w/histSize );
+
+  Mat histImage( hist_h, hist_w, CV_8UC3, Scalar(0,0,0) );
+
+  // Normalize the result to [ 0, histImage.rows ]
+  normalize(hist, hist, 0, histImage.rows, NORM_MINMAX, -1, Mat() );
+
+  /// Draw for each channel
+  for( int i = 1; i < histSize; i++ )
+  {
+      line( histImage, Point( bin_w*(i-1), hist_h - cvRound(hist.at<float>(i-1)) ) ,
+                       Point( bin_w*(i), hist_h - cvRound(hist.at<float>(i)) ),
+                       Scalar( 255, 0, 0), 2, 8, 0  );
+  }
+
+  /// Display
+  namedWindow("calcHist Demo", WINDOW_AUTOSIZE );
+  imshow("calcHist Demo", histImage );
+
+  waitKey(0);
+
+  return 0;
+}
+
 int main(int argc, char** argv)
 {
   cxxopts::Options options("Patronus", "Detect spells using computer vision");
@@ -58,6 +96,20 @@ int main(int argc, char** argv)
 
   namedWindow("Patronus", 1);
 
+  // double brightness = cap.get(CAP_PROP_BRIGHTNESS);
+  // double exposure = cap.get(CAP_PROP_EXPOSURE);
+
+  // cout << "Camera brightness : " << brightness << endl;
+  // cout << "Camera exposure   : " << exposure << endl;
+
+  // // cap.set(CAP_PROP_BRIGHTNESS, brightness - 1.);
+  // cap.set(CAP_PROP_AUTO_EXPOSURE, 0.25);
+  // cap.set(CAP_PROP_EXPOSURE, 0.01);
+
+  // cout << "Camera brightness (after) : " << cap.get(CAP_PROP_BRIGHTNESS) << endl;
+  // cout << "Camera exposure   (after) : " << cap.get(CAP_PROP_EXPOSURE) << endl;
+
+
   if ( debug ) namedWindow("Clamped", 1);
 
   for( ;; ) {
@@ -68,11 +120,13 @@ int main(int argc, char** argv)
 
     // Apply a generous Gaussian blur
     Mat blurred;
-    GaussianBlur(gray, blurred, Size(99, 99), 0);
+    GaussianBlur(gray, blurred, Size(69, 69), 0);
+
+    // double thresh = thresholdValue( blurred );
 
     // Apply a threshold to extract very bright pixels
     Mat clamped;
-    threshold(blurred, clamped, 248, 255, THRESH_BINARY);
+    threshold(blurred, clamped, 252, 255, THRESH_BINARY);
 
     // Find contours
     vector< vector<Point> > contours;
@@ -90,7 +144,8 @@ int main(int argc, char** argv)
         RotatedRect r = fitEllipse(contours[i]);
 
         float e = eccentricity(r);
-        if ( e < 0.8 ) {          // e = 0.8 corresponds to b = 0.6 * a
+        // if ( e < 0.8 ) {          // e = 0.8 corresponds to b = 0.6 * a
+        if ( e < 0.85 ) {          // e = 0.8 corresponds to b = 0.7 * a
           drawRotatedRect(frame, r, Scalar(0, 255, 0));
           lights.push_back(r.center);
         }
