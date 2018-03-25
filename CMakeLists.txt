@@ -1,3 +1,4 @@
+cmake_minimum_required(VERSION 3.9)
 set (CMAKE_CXX_STANDARD 11)
 project (patronus)
 
@@ -14,14 +15,16 @@ add_executable( Patronus Patronus.C )
 target_link_libraries( Patronus ${OpenCV_LIBS} )
 
 # Main graphics
-
-set(CMAKE_MODULE_PATH "/usr/local/Cellar/sfml/2.4.2_1/share/SFML/cmake/Modules" ${CMAKE_MODULE_PATH})
+set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake_modules")
 
 find_package(SFML 2 REQUIRED COMPONENTS network audio graphics window system)
 
 message(STATUS "SFML library status:")
 message(STATUS "    libraries: ${SFML_LIBRARIES}")
+message(STATUS "    include: ${SFML_INCLUDE_DIR}")
 message(STATUS "    dependencies: ${SFML_DEPENDENCIES}")
 
 add_executable( Main Main.C )
+include_directories(${SFML_INCLUDE_DIR})
+
 target_link_libraries(Main ${SFML_LIBRARIES} ${SFML_DEPENDENCIES})
