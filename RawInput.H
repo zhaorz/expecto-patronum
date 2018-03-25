@@ -95,7 +95,7 @@ namespace Wand {
         return;
 
       if ( debug ) namedWindow("Patronus", 1);
-      if ( debug ) namedWindow("Clamped", 1);
+      // if ( debug ) namedWindow("Clamped", 1);
 
       for( ;; ) {
 
@@ -148,12 +148,14 @@ namespace Wand {
             circle(frame, p, 25, Scalar(255, 0, 0), -1);
           }
 
-          imshow("Clamped", clamped);
+          // imshow("Clamped", clamped);
           imshow("Patronus", frame);
         }
 
-        if( waitKey(30) >= 0 ) break;
+        waitKey(30);
+
       }
+
     }
 
   private:
