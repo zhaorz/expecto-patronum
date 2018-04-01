@@ -3,6 +3,7 @@
 #include "cxxopts.hpp"
 
 #include <iostream>
+#include <chrono>
 #include <cmath>
 #include <functional>
 #include <vector>
@@ -77,7 +78,10 @@ namespace Wand {
   class RawInput {
   public:
     // cb(double x, double y, double timestamp)
-    typedef function<void(double, double, double)> InputCb;
+    typedef function<void(double, double, long)> InputCb;
+
+    typedef std::chrono::milliseconds ms;
+    typedef std::chrono::high_resolution_clock Clock;
 
     RawInput() {
       cout << "RawInput : initialized" << endl;
@@ -132,8 +136,9 @@ namespace Wand {
               drawRotatedRect(frame, r, Scalar(0, 255, 0));
               lights.push_back(r.center);
 
-              // TODO: Callback timestamp
-              callback(r.center.x / frame.cols, r.center.y / frame.rows, 0.);
+              // Flipping the x coordinate mirrors the movement
+              callback((frame.cols - r.center.x) / frame.cols, r.center.y / frame.rows,
+                       std::chrono::duration_cast<ms>(Clock::now().time_since_epoch()).count());
             }
           }
         }

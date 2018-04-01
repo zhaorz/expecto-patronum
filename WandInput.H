@@ -81,7 +81,7 @@ namespace Wand {
       return true;
     }
 
-    void rawInputCb (double x, double y, double t) {
+    void rawInputCb (double x, double y, long t) {
       Event event;
       event.type = Event::WandPoint;
       event.wandPoint = { x, y };
