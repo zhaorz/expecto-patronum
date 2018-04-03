@@ -7,6 +7,8 @@
 #include <mutex>
 #include <queue>
 #include <thread>
+#include <unordered_map>
+#include <utility>
 
 #include <boost/asio.hpp>
 #include <boost/bind.hpp>
@@ -18,8 +20,10 @@
 
 using std::lock_guard;
 using std::mutex;
+using std::pair;
 using std::queue;
 using std::thread;
+using std::unordered_map;
 namespace ph = std::placeholders;
 
 
@@ -35,6 +39,10 @@ namespace Wand {
 
     enum EventType {
       WandPoint,
+      Jump,
+      Attack,
+      Reflect,
+      OutOfScreen,
     };
 
     // Members
@@ -49,8 +57,12 @@ namespace Wand {
 
   public:
 
+    typedef pair<pair<double, double>, pair<double, double>> dxdyRange;
+
     static const int analysisInterval = 500;    // Milliseconds
     static const int analysisWindow = 500;     // Milliseconds
+
+    static const unordered_map<Event::EventType, dxdyRange> analysisThresholds;
 
     WandInput() : eventQueue()
                 , rawInput()
@@ -74,7 +86,6 @@ namespace Wand {
 
     void run() {
       std::cout << "WandInput::run" << std::endl;
-      // TODO: Start running
 
       timer.expires_from_now(boost::posix_time::milliseconds(analysisInterval));
       timer.async_wait(boost::bind(&WandInput::analyze, this));
@@ -84,6 +95,53 @@ namespace Wand {
 
     void analyze() {
       std::cout << "WandInput::analyze" << std::endl;
+
+      long after = std::chrono::duration_cast<RawInput::ms>(RawInput::Clock::now()
+                                                            .time_since_epoch()).count() - analysisWindow;
+
+      if ( buf.size() < 2 ) {
+        timer.expires_from_now(boost::posix_time::milliseconds(analysisInterval));
+        timer.async_wait(boost::bind(&WandInput::analyze, this));
+
+        return;
+      }
+
+      double dx = 0.;
+      double dy = 0.;
+
+      double prevX = buf.rbegin()->x;
+      double prevY = buf.rbegin()->y;
+
+      for ( auto e = buf.rbegin() + 1; e < buf.rend(); e++ ) {
+        if ( e->t < after ) break;
+
+        dx += prevX - e->x;
+        dy += prevY - e->y;
+
+        prevX = e->x;
+        prevY = e->y;
+      }
+
+      std::cout << "WandInput::analyze : detected : dx,dy = " << dx << ", " << dy << std::endl;
+
+      for ( auto e = analysisThresholds.cbegin(); e != analysisThresholds.cend(); e++ ) {
+        dxdyRange range = e->second;
+
+        double dx0, dx1, dy0, dy1;
+
+        std::tie(dx0, dx1) = range.first;
+        std::tie(dy0, dy1) = range.second;
+
+        if ( (dx0 < dx && dx < dx1) && (dy0 < dy && dy < dy1) ) {
+          std::cout << "WandInput::analyze : triggered : " << e->first << std::endl;
+
+          Event event;
+          event.type = e->first;
+
+          pushEvent( event );
+          break;
+        }
+      }
 
       timer.expires_from_now(boost::posix_time::milliseconds(analysisInterval));
       timer.async_wait(boost::bind(&WandInput::analyze, this));
@@ -139,4 +197,9 @@ namespace Wand {
 
   };
 
+  const unordered_map<Event::EventType, WandInput::dxdyRange> WandInput::analysisThresholds = {
+    { Event::Jump,    { { -0.1,  0.1 }, { -1.0, -0.3 } }},
+    { Event::Attack,  { {  0.3,  1.0 }, { -1.0, -0.3 } }},
+    { Event::Reflect, { { -1.0, -0.3 }, {  0.3,  1.0 } }},
+  };
 }
