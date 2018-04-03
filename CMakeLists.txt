@@ -25,7 +25,16 @@ message(STATUS "    libraries: ${SFML_LIBRARIES}")
 message(STATUS "    include: ${SFML_INCLUDE_DIR}")
 message(STATUS "    dependencies: ${SFML_DEPENDENCIES}")
 
+find_package(Boost COMPONENTS date_time system REQUIRED)
+if(Boost_FOUND)
+  include_directories(${Boost_INCLUDE_DIRS})
+endif()
+
+message(STATUS "Boost library status:")
+message(STATUS "    libraries: ${Boost_LIBRARIES}")
+message(STATUS "    include: ${Boost_INCLUDE_DIRS}")
+
 add_executable( Main Main.C )
 include_directories(${SFML_INCLUDE_DIR})
 
-target_link_libraries(Main ${OpenCV_LIBS} ${SFML_LIBRARIES} ${SFML_DEPENDENCIES})
+target_link_libraries(Main ${OpenCV_LIBS} ${SFML_LIBRARIES} ${SFML_DEPENDENCIES} ${Boost_LIBRARIES})

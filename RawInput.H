@@ -75,6 +75,12 @@ double thresholdValue(Mat& image)
 
 namespace Wand {
 
+  struct RawInputEvent {
+    double x;
+    double y;
+    long t;
+  };
+
   class RawInput {
   public:
     // cb(double x, double y, double timestamp)
