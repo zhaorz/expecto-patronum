@@ -17,6 +17,7 @@ int main()
 
   std::shared_ptr<sf::RenderWindow> window =
     std::make_shared<sf::RenderWindow>(sf::VideoMode(width, height), "SFML works!");
+  window->setFramerateLimit(60);
 
   sf::CircleShape shape(20.f);
 
@@ -28,6 +29,7 @@ int main()
 
   Game::GameController game(window);
 
+  sf::Clock clock;
 
   while ( window->isOpen() ) {
     sf::Event event;
@@ -62,23 +64,15 @@ int main()
     Wand::Event wandEvent;
 
     while ( wandInput.pollEvent(wandEvent) ) {
-
-      switch (wandEvent.type) {
-      case Wand::Event::WandPoint:
-
-        shape.setPosition(wandEvent.wandPoint.x * width, wandEvent.wandPoint.y * height);
-
-        game.onWandInput(wandEvent);
-
-        break;
-
-      default:
-        break;
-      }
+      game.onWandInput(wandEvent);
     }
 
     window->clear();
+
     game.draw();
+    game.update(clock.getElapsedTime().asSeconds());
+    clock.restart();
+
     window->display();
   }
 

@@ -59,7 +59,7 @@ namespace Wand {
 
     typedef pair<pair<double, double>, pair<double, double>> dxdyRange;
 
-    static const int analysisInterval = 500;    // Milliseconds
+    static const int analysisInterval = 50;    // Milliseconds
     static const int analysisWindow = 500;     // Milliseconds
 
     static const unordered_map<Event::EventType, dxdyRange> analysisThresholds;
@@ -94,7 +94,7 @@ namespace Wand {
     }
 
     void analyze() {
-      std::cout << "WandInput::analyze" << std::endl;
+      // std::cout << "WandInput::analyze" << std::endl;
 
       long after = std::chrono::duration_cast<RawInput::ms>(RawInput::Clock::now()
                                                             .time_since_epoch()).count() - analysisWindow;
@@ -122,7 +122,7 @@ namespace Wand {
         prevY = e->y;
       }
 
-      std::cout << "WandInput::analyze : detected : dx,dy = " << dx << ", " << dy << std::endl;
+      // std::cout << "WandInput::analyze : detected : dx,dy = " << dx << ", " << dy << std::endl;
 
       for ( auto e = analysisThresholds.cbegin(); e != analysisThresholds.cend(); e++ ) {
         dxdyRange range = e->second;

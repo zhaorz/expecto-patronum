@@ -19,7 +19,7 @@ namespace Game {
 
     GameController( std::shared_ptr<sf::RenderWindow> window )
       : window(window)
-      , harry(sf::Vector2f(0.f, 0.f), assetBasePath + "harry-default.png")
+      , harry(sf::Vector2f(100.f, 500.f), assetBasePath + "harry-default.png")
     {
 
       if ( !backgroundTexture.loadFromFile(assetBasePath + "chamber-of-secrets.png") ) {
@@ -34,12 +34,43 @@ namespace Game {
       window->draw(harry.getSprite());
     }
 
+    void update( float elapsedTime ) {
+      harry.update(elapsedTime);
+    }
+
     void onMousePress() {
       cout << "GameController : onMousePress" << endl;
     }
 
     void onWandInput( Wand::Event& event ) {
-      cout << "GameController : onWandInput" << endl;
+      switch ( event.type ) {
+
+      case Wand::Event::WandPoint:
+        // cout << "GameController.onWandInput : WandPoint" << endl;
+        break;
+
+      case Wand::Event::Jump:
+        cout << "GameController.onWandInput : Jump" << endl;
+        harry.jump();
+        break;
+
+      case Wand::Event::Attack:
+        cout << "GameController.onWandInput : Attack" << endl;
+        break;
+
+      case Wand::Event::Reflect:
+        cout << "GameController.onWandInput : Reflect" << endl;
+        break;
+
+      case Wand::Event::OutOfScreen:
+        cout << "GameController.onWandInput : OutOfScreen" << endl;
+        break;
+
+      default:
+        cout << "GameController.onWandInput : Unknown event" << endl;
+        break;
+
+      }
     }
 
   private:
