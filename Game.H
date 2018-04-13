@@ -19,7 +19,11 @@ namespace Game {
 
     GameController( std::shared_ptr<sf::RenderWindow> window )
       : window(window)
-      , harry(sf::Vector2f(100.f, 500.f), assetBasePath + "harry-default.png")
+      , harry(sf::IntRect(0, 0, 960, 1080),
+              assetBasePath + "harry-default.png")
+      , voldemort(sf::IntRect(960, 0, 960, 1080),
+                  assetBasePath + "voldemort-default.png",
+                  true)         // Voldemort is reversed
     {
 
       if ( !backgroundTexture.loadFromFile(assetBasePath + "chamber-of-secrets.png") ) {
@@ -32,6 +36,7 @@ namespace Game {
     void draw() {
       window->draw(backgroundSprite);
       window->draw(harry.getSprite());
+      window->draw(voldemort.getSprite());
     }
 
     void update( float elapsedTime ) {
@@ -83,6 +88,7 @@ namespace Game {
 
     // Characters
     Character harry;
+    Character voldemort;
   };
 
 };
