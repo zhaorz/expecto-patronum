@@ -54,6 +54,34 @@ int main()
         game.onMousePress();
         break;
 
+      case sf::Event::KeyPressed:
+        // Debugging
+        Wand::Event syntheticEvent;
+
+        switch ( event.key.code ) {
+
+        case sf::Keyboard::W:
+          syntheticEvent.type = Wand::Event::Jump;
+          game.onWandInput(syntheticEvent);
+          break;
+
+        case sf::Keyboard::D:
+          syntheticEvent.type = Wand::Event::Attack;
+          game.onWandInput(syntheticEvent);
+          break;
+
+        case sf::Keyboard::A:
+          syntheticEvent.type = Wand::Event::Reflect;
+          break;
+
+        default:
+          break;
+
+        }
+
+        game.onWandInput(syntheticEvent);
+        break;
+
         // we don't process other types of events
       default:
         break;
