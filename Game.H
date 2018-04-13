@@ -20,9 +20,11 @@ namespace Game {
     GameController( std::shared_ptr<sf::RenderWindow> window )
       : window(window)
       , harry(sf::IntRect(0, 0, 960, 1080),
-              assetBasePath + "harry-default.png")
+              assetBasePath + "harry-default.png",
+              "Harry")
       , voldemort(sf::IntRect(960, 0, 960, 1080),
                   assetBasePath + "voldemort-default.png",
+                  "Voldemort",
                   true)         // Voldemort is reversed
     {
 
@@ -30,13 +32,21 @@ namespace Game {
         cout << "Error loading background texture" << endl;
       }
 
+      if ( !font.loadFromFile(assetBasePath + "8bit.ttf") ) {
+        cout << "Error loading font" << endl;
+      }
+
+      harry.setFont(font);
+      voldemort.setFont(font);
+
       backgroundSprite.setTexture(backgroundTexture);
     }
 
     void draw() {
       window->draw(backgroundSprite);
-      window->draw(harry.getSprite());
-      window->draw(voldemort.getSprite());
+
+      harry.draw(window);
+      voldemort.draw(window);
     }
 
     void update( float elapsedTime ) {
@@ -89,6 +99,9 @@ namespace Game {
     // Characters
     Character harry;
     Character voldemort;
+
+    // Shared assets
+    sf::Font font;
   };
 
 };

@@ -16,20 +16,24 @@ namespace Game {
 
     Character ( const sf::IntRect& bbox,
                 const string& pathToSprite,
+                const string& name,
                 bool reversed = false )
       : bbox(bbox)
       , bLeft(bbox.left)
       , bTop(bbox.top)
       , bWidth(bbox.width)
       , bHeight(bbox.height)
+      , name(name)
       , velocity(0.f, 0.f)
-      , ground(900.f)
+      , ground(950.f)
       , isJumping(false)
       , reversed(reversed)
     {
       if ( !texture.loadFromFile(pathToSprite) ) {
         cout << "Error loading Character texture" << endl;
       }
+
+      // Sprite initialization ----------------------------------------------------------------------
 
       sprite.setTexture(texture);
       sf::IntRect rect = sprite.getTextureRect();
@@ -44,6 +48,16 @@ namespace Game {
       }
 
       sprite.setPosition(position);
+
+      // Game elements ------------------------------------------------------------------------------
+
+      nameText.setString(name);
+      nameText.setCharacterSize(63);
+      nameText.setPosition(sf::Vector2f(bLeft + 50.f, bTop + 50.f));
+    }
+
+    void setFont( const sf::Font& font ) {
+      nameText.setFont(font);
     }
 
     void update( float elapsedTime ) {
@@ -72,6 +86,10 @@ namespace Game {
       return sprite;
     }
 
+    void draw( std::shared_ptr<sf::RenderWindow> window ) {
+      window->draw(sprite);
+      window->draw(nameText);
+    }
 
   private:
 
@@ -81,6 +99,10 @@ namespace Game {
     int bTop;
     int bWidth;
     int bHeight;
+
+    // Title
+    const string name;
+    sf::Text nameText;
 
     // Character size
     int cWidth;
