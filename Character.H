@@ -84,13 +84,13 @@ namespace Game {
       nameText.setFont(font);
     }
 
-    void setSpellController( const SpellController& controller ) {
+    void setSpellController( SpellController& controller ) {
       if ( isOpponent ) {
-        castAttack = std::bind(&SpellController::castOpponentAttack, controller);
-        castReflect = std::bind(&SpellController::castOpponentReflect, controller);
+        castAttack = [&] () { controller.castOpponentAttack(); };
+        castReflect = [&] () { controller.castOpponentReflect(); };
       } else {
-        castAttack = std::bind(&SpellController::castPlayerAttack, controller);
-        castReflect = std::bind(&SpellController::castPlayerReflect, controller);
+        castAttack = [&] () { controller.castPlayerAttack(); };
+        castReflect = [&] () { controller.castPlayerReflect(); };
       }
     }
 

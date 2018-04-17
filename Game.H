@@ -31,7 +31,8 @@ namespace Game {
                   assetBasePath + "voldemort-default.png",
                   "Voldemort",
                   true)         // Voldemort is reversed
-      , spellController(sf::IntRect(100, 600, 1720, 50))
+      , spellController(sf::IntRect(200, 600, 1520, 50),
+                        assetBasePath)
     {
 
       if ( !backgroundTexture.loadFromFile(assetBasePath + "chamber-of-secrets.png") ) {
@@ -45,8 +46,8 @@ namespace Game {
       harry.setFont(font);
       voldemort.setFont(font);
 
-      spellController.setPlayerHit(std::bind(&Character::hit, harry));
-      spellController.setOpponentHit(std::bind(&Character::hit, voldemort));
+      spellController.setPlayerHit(std::bind(&Character::hit, &harry));
+      spellController.setOpponentHit(std::bind(&Character::hit, &voldemort));
 
       harry.setSpellController(spellController);
       voldemort.setSpellController(spellController);
