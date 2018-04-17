@@ -20,9 +20,11 @@ namespace Game {
     GameController( std::shared_ptr<sf::RenderWindow> window )
       : window(window)
       , harry(sf::IntRect(0, 0, 960, 1080),
+              assetBasePath,
               assetBasePath + "harry-default.png",
               "Harry")
       , voldemort(sf::IntRect(960, 0, 960, 1080),
+                  assetBasePath,
                   assetBasePath + "voldemort-default.png",
                   "Voldemort",
                   true)         // Voldemort is reversed

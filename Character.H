@@ -11,10 +11,13 @@ namespace Game {
   // Pixels per second^2
   const sf::Vector2f gravity = sf::Vector2f(0., 2000.f);
 
+  const float margin = 50.f;
+
   class Character {
   public:
 
     Character ( const sf::IntRect& bbox,
+                const string& assetBasePath,
                 const string& pathToSprite,
                 const string& name,
                 bool reversed = false )
@@ -24,6 +27,7 @@ namespace Game {
       , bWidth(bbox.width)
       , bHeight(bbox.height)
       , name(name)
+      , nLives(3)
       , velocity(0.f, 0.f)
       , ground(950.f)
       , isJumping(false)
@@ -31,6 +35,10 @@ namespace Game {
     {
       if ( !texture.loadFromFile(pathToSprite) ) {
         cout << "Error loading Character texture" << endl;
+      }
+
+      if ( !heartTexture.loadFromFile(assetBasePath + "heart.png") ) {
+        cout << "Error loading Heart texture" << endl;
       }
 
       // Sprite initialization ----------------------------------------------------------------------
@@ -49,11 +57,20 @@ namespace Game {
 
       sprite.setPosition(position);
 
+      heartTexture.setRepeated(true);
+      heartSprite.setTexture(heartTexture);
+
       // Game elements ------------------------------------------------------------------------------
 
       nameText.setString(name);
       nameText.setCharacterSize(63);
-      nameText.setPosition(sf::Vector2f(bLeft + 50.f, bTop + 50.f));
+      nameText.setPosition(sf::Vector2f(bLeft + margin, bTop + margin));
+
+      sf::Vector2u heartSize = heartTexture.getSize();
+      heartSprite.setTextureRect(sf::IntRect(0, 0, nLives * heartSize.x, heartSize.y));
+      heartSprite.setPosition(sf::Vector2f(bLeft + margin,
+                                           bTop + nameText.getLocalBounds().height + 3 * margin));
+
     }
 
     void setFont( const sf::Font& font ) {
@@ -89,6 +106,7 @@ namespace Game {
     void draw( std::shared_ptr<sf::RenderWindow> window ) {
       window->draw(sprite);
       window->draw(nameText);
+      window->draw(heartSprite);
     }
 
   private:
@@ -103,6 +121,11 @@ namespace Game {
     // Title
     const string name;
     sf::Text nameText;
+
+    // Health
+    int nLives;
+    sf::Texture heartTexture;
+    sf::Sprite heartSprite;
 
     // Character size
     int cWidth;
