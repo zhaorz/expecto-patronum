@@ -1,9 +1,15 @@
+#pragma once
+
+#include <functional>
 #include <string>
 
 #include <SFML/Graphics.hpp>
 
+#include "SpellController.H"
+
 using std::cout;
 using std::endl;
+using std::function;
 using std::string;
 
 namespace Game {
@@ -20,7 +26,7 @@ namespace Game {
                 const string& assetBasePath,
                 const string& pathToSprite,
                 const string& name,
-                bool reversed = false )
+                bool isOpponent = false )
       : bbox(bbox)
       , bLeft(bbox.left)
       , bTop(bbox.top)
@@ -31,7 +37,8 @@ namespace Game {
       , velocity(0.f, 0.f)
       , ground(950.f)
       , isJumping(false)
-      , reversed(reversed)
+      , isOpponent(isOpponent)
+      , reversed(isOpponent)
     {
       if ( !texture.loadFromFile(pathToSprite) ) {
         cout << "Error loading Character texture" << endl;
@@ -73,11 +80,21 @@ namespace Game {
 
     }
 
-    void setFont( const sf::Font& font ) {
+    void setFont ( const sf::Font& font ) {
       nameText.setFont(font);
     }
 
-    void update( float elapsedTime ) {
+    void setSpellController( const SpellController& controller ) {
+      if ( isOpponent ) {
+        castAttack = std::bind(&SpellController::castOpponentAttack, controller);
+        castReflect = std::bind(&SpellController::castOpponentReflect, controller);
+      } else {
+        castAttack = std::bind(&SpellController::castPlayerAttack, controller);
+        castReflect = std::bind(&SpellController::castPlayerReflect, controller);
+      }
+    }
+
+    void update ( float elapsedTime ) {
       if ( isJumping ) velocity += elapsedTime * gravity;
       position += elapsedTime * velocity;
 
@@ -91,22 +108,29 @@ namespace Game {
       sprite.setPosition(position);
     }
 
-    void jump() {
+    void jump () {
       if ( isJumping ) return;
 
       isJumping = true;
-      cout << "Character.jump : jumping" << endl;
       velocity = sf::Vector2f(0., -1000.f);
     }
 
-    const sf::Sprite& getSprite() {
-      return sprite;
+    void attack () {
+      castAttack();
     }
 
-    void draw( std::shared_ptr<sf::RenderWindow> window ) {
+    void reflect () {
+      castReflect();
+    }
+
+    void draw ( std::shared_ptr<sf::RenderWindow> window ) {
       window->draw(sprite);
       window->draw(nameText);
       window->draw(heartSprite);
+    }
+
+    void hit () {
+      cout << "Character.hit" << endl;
     }
 
   private:
@@ -133,6 +157,7 @@ namespace Game {
 
     sf::Vector2f position;
     bool reversed;
+    bool isOpponent;
 
     // Kinematics
     sf::Vector2f velocity;
@@ -140,6 +165,10 @@ namespace Game {
     // Jump mechanics
     bool isJumping;
     float ground;
+
+    // Spell mechanics
+    function<void()> castAttack;
+    function<void()> castReflect;
 
     sf::Texture texture;
     sf::Sprite  sprite;

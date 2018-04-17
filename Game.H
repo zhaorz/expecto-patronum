@@ -1,8 +1,11 @@
+#pragma once
+
 #include <string>
 
 #include <SFML/Graphics.hpp>
 
 #include "Character.H"
+#include "SpellController.H"
 #include "WandInput.H"
 
 using std::cout;
@@ -28,6 +31,7 @@ namespace Game {
                   assetBasePath + "voldemort-default.png",
                   "Voldemort",
                   true)         // Voldemort is reversed
+      , spellController(sf::IntRect(100, 600, 1720, 50))
     {
 
       if ( !backgroundTexture.loadFromFile(assetBasePath + "chamber-of-secrets.png") ) {
@@ -41,6 +45,12 @@ namespace Game {
       harry.setFont(font);
       voldemort.setFont(font);
 
+      spellController.setPlayerHit(std::bind(&Character::hit, harry));
+      spellController.setOpponentHit(std::bind(&Character::hit, voldemort));
+
+      harry.setSpellController(spellController);
+      voldemort.setSpellController(spellController);
+
       backgroundSprite.setTexture(backgroundTexture);
     }
 
@@ -49,10 +59,13 @@ namespace Game {
 
       harry.draw(window);
       voldemort.draw(window);
+
+      spellController.draw(window);
     }
 
     void update( float elapsedTime ) {
       harry.update(elapsedTime);
+      spellController.update(elapsedTime);
     }
 
     void onMousePress() {
@@ -73,10 +86,12 @@ namespace Game {
 
       case Wand::Event::Attack:
         cout << "GameController.onWandInput : Attack" << endl;
+        harry.attack();
         break;
 
       case Wand::Event::Reflect:
         cout << "GameController.onWandInput : Reflect" << endl;
+        harry.reflect();
         break;
 
       case Wand::Event::OutOfScreen:
@@ -101,6 +116,8 @@ namespace Game {
     // Characters
     Character harry;
     Character voldemort;
+
+    SpellController spellController;
 
     // Shared assets
     sf::Font font;
