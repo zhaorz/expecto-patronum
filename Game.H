@@ -15,6 +15,9 @@ using std::string;
 
 namespace Game {
 
+  const int windowWidth = 1920;
+  const int windowHeight = 1080;
+
   const string assetBasePath = "../assets/";
 
   class GameController {
@@ -34,6 +37,7 @@ namespace Game {
                   true)         // Voldemort is reversed
       , spellController(sf::IntRect(200, 600, 1520, 50),
                         assetBasePath)
+      , gameOver(false)
     {
       if ( !backgroundTexture.loadFromFile(assetBasePath + "chamber-of-secrets.png") ) {
         cout << "Error loading background texture" << endl;
@@ -56,22 +60,43 @@ namespace Game {
       voldemortController.setJump([&] () { voldemort.jump(); });
 
       backgroundSprite.setTexture(backgroundTexture);
+
+      gameOverText.setString("Game over");
+      gameOverText.setFont(font);
+      gameOverText.setCharacterSize(81);
+      auto textBounds = gameOverText.getLocalBounds();
+      gameOverText.setPosition(sf::Vector2f(windowWidth / 2. - textBounds.width / 2,
+                                            windowHeight / 2. - textBounds.height / 2.));
     }
 
-    void draw() {
+    void draw () {
       window->draw(backgroundSprite);
 
       harry.draw(window);
       voldemort.draw(window);
 
       spellController.draw(window);
+
+      if ( gameOver ) {
+        window->draw(gameOverText);
+      }
     }
 
-    void update( float elapsedTime ) {
-      harry.update(elapsedTime);
-      voldemort.update(elapsedTime);
-      voldemortController.update(elapsedTime);
-      spellController.update(elapsedTime);
+    void update ( float elapsedTime ) {
+      updateGameOver();
+
+      if ( !gameOver ) {
+        harry.update(elapsedTime);
+        voldemort.update(elapsedTime);
+        voldemortController.update(elapsedTime);
+        spellController.update(elapsedTime);
+      }
+    }
+
+    void updateGameOver () {
+      if ( !harry.alive() || !voldemort.alive() ) {
+        gameOver = true;
+      }
     }
 
     void onMousePress() {
@@ -127,6 +152,9 @@ namespace Game {
     Voldemort voldemortController;
 
     SpellController spellController;
+
+    bool gameOver;
+    sf::Text gameOverText;
 
     // Shared assets
     sf::Font font;

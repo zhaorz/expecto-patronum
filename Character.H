@@ -94,6 +94,10 @@ namespace Game {
       }
     }
 
+    bool alive () {
+      return nLives > 0;
+    }
+
     void update ( float elapsedTime ) {
       if ( isJumping ) velocity += elapsedTime * gravity;
       position += elapsedTime * velocity;
@@ -130,7 +134,6 @@ namespace Game {
     }
 
     void hit () {
-      cout << "Character.hit" << endl;
       nLives--;
       sf::Vector2u heartSize = heartTexture.getSize();
       heartSprite.setTextureRect(sf::IntRect(0, 0, nLives * heartSize.x, heartSize.y));

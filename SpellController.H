@@ -195,13 +195,11 @@ namespace Game {
     }
 
     void castPlayerAttack () {
-      cout << "SpellController.castPlayerAttack" << endl;
       Spell spell(playerSpellOrigin, playerAttackTexture);
       playerSpells.push_back(std::move(spell));
     }
 
     void castOpponentAttack () {
-      cout << "SpellController.castOpponentAttack" << endl;
       Spell spell(opponentSpellOrigin, opponentAttackTexture, -1);
       opponentSpells.push_back(std::move(spell));
     }
@@ -268,8 +266,6 @@ namespace Game {
 
             Explosion explosion(sf::Vector2f(center, playerSpellOrigin.y), explosionTexture);
             explosions.push_back(std::move(explosion));
-
-            cout << "Explosion" << endl;
 
             playerSpell.hide();
             opponentSpell.hide();
