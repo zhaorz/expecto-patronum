@@ -18,11 +18,13 @@ namespace Game {
   public:
 
     Spell ( const sf::Vector2f& position,
-            const sf::Texture& texture )
+            const sf::Texture& texture,
+            const int direction = 1 )
       : width(texture.getSize().x)
       , left(0.f)
       , top(0.f)
       , height(texture.getSize().y)
+      , direction(direction)
       , totalElapsedTime(0.f)
     {
       sprite.setTexture(texture);
@@ -37,10 +39,11 @@ namespace Game {
 
     void update ( float elapsedTime ) {
 
-      sprite.move(elapsedTime * speed);
+      sprite.move(direction * elapsedTime * speed);
 
       totalElapsedTime += elapsedTime;
 
+      // Update the sprite frame
       if ( totalElapsedTime > framePeriod ) {
         totalElapsedTime -= framePeriod;
 
@@ -69,6 +72,9 @@ namespace Game {
     int top;
     int left;
 
+    // Either +1 or -1
+    int direction;
+
     sf::Sprite sprite;
 
     static const sf::Vector2f speed;  // Pixels per second
@@ -84,9 +90,13 @@ namespace Game {
                       const string& assetBasePath )
       : bbox(bbox)
       , playerSpellOrigin(sf::Vector2f(bbox.left, bbox.top))
-      , opponentSpellOrigin(sf::Vector2f(bbox.left + bbox.width, bbox.top))
+      , opponentSpellOrigin(sf::Vector2f(bbox.left + bbox.width - 100, bbox.top))
     {
-      if ( !attackTexture.loadFromFile(assetBasePath + "attack-spell.png") ) {
+      if ( !playerAttackTexture.loadFromFile(assetBasePath + "attack-spell.png") ) {
+        cout << "Error loading attack spell texture" << endl;
+      }
+
+      if ( !opponentAttackTexture.loadFromFile(assetBasePath + "attack-spell-green.png") ) {
         cout << "Error loading attack spell texture" << endl;
       }
     }
@@ -101,9 +111,8 @@ namespace Game {
 
     void castPlayerAttack () {
       cout << "SpellController.castPlayerAttack" << endl;
-      Spell spell(playerSpellOrigin, attackTexture);
+      Spell spell(playerSpellOrigin, playerAttackTexture);
       playerSpells.push_back(std::move(spell));
-
     }
 
     void castPlayerReflect () {
@@ -112,6 +121,8 @@ namespace Game {
 
     void castOpponentAttack () {
       cout << "SpellController.castOpponentAttack" << endl;
+      Spell spell(opponentSpellOrigin, opponentAttackTexture, -1);
+      opponentSpells.push_back(std::move(spell));
     }
 
     void castOpponentReflect () {
@@ -130,11 +141,26 @@ namespace Game {
           ++it;
         }
       }
+
+      it = opponentSpells.begin();
+      while (it != opponentSpells.end()) {
+        it->update(elapsedTime);
+
+        if ( it->getPosition().x < bbox.left ) {
+          playerHitCb();
+          it = opponentSpells.erase(it);
+        } else {
+          ++it;
+        }
+      }
     }
 
     void draw( std::shared_ptr<sf::RenderWindow> window ) {
-
       for ( auto &spell : playerSpells ) {
+        spell.draw(window);
+      }
+
+      for ( auto &spell : opponentSpells ) {
         spell.draw(window);
       }
     }
@@ -145,6 +171,7 @@ namespace Game {
     sf::Vector2f opponentSpellOrigin;
 
     vector<Spell> playerSpells;
+    vector<Spell> opponentSpells;
 
     function<void()> playerHitCb;
     function<void()> opponentHitCb;
@@ -152,7 +179,8 @@ namespace Game {
     sf::IntRect bbox;
 
     // Attack
-    sf::Texture attackTexture;
+    sf::Texture playerAttackTexture;
+    sf::Texture opponentAttackTexture;
 
   };
 
