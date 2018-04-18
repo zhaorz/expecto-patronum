@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cmath>
 #include <functional>
 #include <string>
 #include <vector>
@@ -17,6 +18,8 @@ namespace Game {
   class Spell {
   public:
 
+    bool hidden;
+
     Spell ( const sf::Vector2f& position,
             const sf::Texture& texture,
             const int direction = 1 )
@@ -26,6 +29,7 @@ namespace Game {
       , height(texture.getSize().y)
       , direction(direction)
       , totalElapsedTime(0.f)
+      , hidden(false)
     {
       sprite.setTexture(texture);
       sprite.setTextureRect(sf::IntRect(left, top, w, h));
@@ -35,6 +39,10 @@ namespace Game {
 
     const sf::Vector2f& getPosition() {
       return sprite.getPosition();
+    }
+
+    void hide () {
+      hidden = true;
     }
 
     void update ( float elapsedTime ) {
@@ -53,7 +61,9 @@ namespace Game {
     }
 
     void draw ( std::shared_ptr<sf::RenderWindow> window ) {
-      window->draw(sprite);
+      if ( !hidden ) {
+        window->draw(sprite);
+      }
     }
 
   private:
@@ -83,6 +93,77 @@ namespace Game {
 
   const sf::Vector2f Spell::speed = sf::Vector2f(1000.f, 0.f);
 
+  class Explosion {
+  public:
+
+    bool done;
+
+    Explosion ( const sf::Vector2f& position,
+                const sf::Texture& texture )
+      : width(texture.getSize().x)
+      , left(0.f)
+      , top(0.f)
+      , height(texture.getSize().y)
+      , totalElapsedTime(0.f)
+      , done(false)
+    {
+      sprite.setTexture(texture);
+      sprite.setTextureRect(sf::IntRect(left, top, w, h));
+      sprite.setPosition(position);
+    }
+
+    const sf::Vector2f& getPosition() {
+      return sprite.getPosition();
+    }
+
+    void update ( float elapsedTime ) {
+      totalElapsedTime += elapsedTime;
+
+      // Update the sprite frame
+      if ( totalElapsedTime > framePeriod ) {
+        totalElapsedTime -= framePeriod;
+
+        left = (left + w) % width;
+
+        if ( left == 0 ) {
+          top = (top + h) % height;
+
+          // Wraparound to top again
+          if ( top == 0 ) {
+            done = true;
+          }
+        }
+
+        sprite.setTextureRect(sf::IntRect(left, top, w, h));
+      }
+    }
+
+    void draw ( std::shared_ptr<sf::RenderWindow> window ) {
+      if ( !done ) {
+        window->draw(sprite);
+      }
+    }
+
+  private:
+
+    static constexpr float framePeriod = 1. / 24; // 24 fps
+    float totalElapsedTime;
+
+    // Size of a single sprite on the sprite sheet
+    static const int w = 256;
+    static const int h = 256;
+
+    // Size of the entire sprite sheet
+    int width;
+    int height;
+
+    int top;
+    int left;
+
+    sf::Sprite sprite;
+
+  };
+
   class SpellController {
   public:
 
@@ -90,7 +171,7 @@ namespace Game {
                       const string& assetBasePath )
       : bbox(bbox)
       , playerSpellOrigin(sf::Vector2f(bbox.left, bbox.top))
-      , opponentSpellOrigin(sf::Vector2f(bbox.left + bbox.width - 100, bbox.top))
+      , opponentSpellOrigin(sf::Vector2f(bbox.left + bbox.width - spellWidth, bbox.top))
     {
       if ( !playerAttackTexture.loadFromFile(assetBasePath + "attack-spell.png") ) {
         cout << "Error loading attack spell texture" << endl;
@@ -98,6 +179,10 @@ namespace Game {
 
       if ( !opponentAttackTexture.loadFromFile(assetBasePath + "attack-spell-green.png") ) {
         cout << "Error loading attack spell texture" << endl;
+      }
+
+      if ( !explosionTexture.loadFromFile(assetBasePath + "explosion71.png") ) {
+        cout << "Error loading explosion texture" << endl;
       }
     }
 
@@ -115,14 +200,14 @@ namespace Game {
       playerSpells.push_back(std::move(spell));
     }
 
-    void castPlayerReflect () {
-      cout << "SpellController.castPlayerReflect" << endl;
-    }
-
     void castOpponentAttack () {
       cout << "SpellController.castOpponentAttack" << endl;
       Spell spell(opponentSpellOrigin, opponentAttackTexture, -1);
       opponentSpells.push_back(std::move(spell));
+    }
+
+    void castPlayerReflect () {
+      cout << "SpellController.castPlayerReflect" << endl;
     }
 
     void castOpponentReflect () {
@@ -137,6 +222,8 @@ namespace Game {
         if ( it->getPosition().x > bbox.left + bbox.width ) {
           opponentHitCb();
           it = playerSpells.erase(it);
+        } else if ( it->hidden ) {
+          it = playerSpells.erase(it);
         } else {
           ++it;
         }
@@ -149,8 +236,45 @@ namespace Game {
         if ( it->getPosition().x < bbox.left ) {
           playerHitCb();
           it = opponentSpells.erase(it);
+        } else if ( it->hidden ) {
+          it = opponentSpells.erase(it);
         } else {
           ++it;
+        }
+      }
+
+      auto eit = explosions.begin();
+      while (eit != explosions.end()) {
+        eit->update(elapsedTime);
+
+        if ( eit->done ) {
+          eit = explosions.erase(eit);
+        } else {
+          ++eit;
+        }
+      }
+
+      // Check for intersecting spells
+      for ( auto &playerSpell : playerSpells ) {
+        if ( playerSpell.hidden ) continue;
+        float px = playerSpell.getPosition().x;
+        for ( auto &opponentSpell : opponentSpells ) {
+          if ( opponentSpell.hidden ) continue;
+          float ox = opponentSpell.getPosition().x;
+
+          if ( (px < ox && ox < px + spellWidth)
+               || (ox < px && px < ox + spellWidth) ) {
+            float center = std::min(px, ox) + std::fabs(px - ox) + spellWidth / 2.f;
+
+            Explosion explosion(sf::Vector2f(center, playerSpellOrigin.y), explosionTexture);
+            explosions.push_back(std::move(explosion));
+
+            cout << "Explosion" << endl;
+
+            playerSpell.hide();
+            opponentSpell.hide();
+            break;
+          }
         }
       }
     }
@@ -163,6 +287,10 @@ namespace Game {
       for ( auto &spell : opponentSpells ) {
         spell.draw(window);
       }
+
+      for ( auto &explosion : explosions ) {
+        explosion.draw(window);
+      }
     }
 
   private:
@@ -172,15 +300,19 @@ namespace Game {
 
     vector<Spell> playerSpells;
     vector<Spell> opponentSpells;
+    vector<Explosion> explosions;
 
     function<void()> playerHitCb;
     function<void()> opponentHitCb;
 
     sf::IntRect bbox;
 
-    // Attack
+    static constexpr float spellWidth = 200;
+
+    // Assets
     sf::Texture playerAttackTexture;
     sf::Texture opponentAttackTexture;
+    sf::Texture explosionTexture;
 
   };
 
