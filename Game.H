@@ -6,6 +6,7 @@
 
 #include "Character.H"
 #include "SpellController.H"
+#include "Voldemort.H"
 #include "WandInput.H"
 
 using std::cout;
@@ -51,6 +52,9 @@ namespace Game {
       harry.setSpellController(spellController);
       voldemort.setSpellController(spellController);
 
+      voldemortController.setAttack([&] () { voldemort.attack(); });
+      voldemortController.setJump([&] () { voldemort.jump(); });
+
       backgroundSprite.setTexture(backgroundTexture);
     }
 
@@ -65,6 +69,8 @@ namespace Game {
 
     void update( float elapsedTime ) {
       harry.update(elapsedTime);
+      voldemort.update(elapsedTime);
+      voldemortController.update(elapsedTime);
       spellController.update(elapsedTime);
     }
 
@@ -116,6 +122,9 @@ namespace Game {
     // Characters
     Character harry;
     Character voldemort;
+
+    // CPU player
+    Voldemort voldemortController;
 
     SpellController spellController;
 
