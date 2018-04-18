@@ -34,7 +34,6 @@ namespace Game {
       , spellController(sf::IntRect(200, 600, 1520, 50),
                         assetBasePath)
     {
-
       if ( !backgroundTexture.loadFromFile(assetBasePath + "chamber-of-secrets.png") ) {
         cout << "Error loading background texture" << endl;
       }
@@ -46,8 +45,8 @@ namespace Game {
       harry.setFont(font);
       voldemort.setFont(font);
 
-      spellController.setPlayerHit(std::bind(&Character::hit, &harry));
-      spellController.setOpponentHit(std::bind(&Character::hit, &voldemort));
+      spellController.setPlayerHit([&] () { harry.hit(); });
+      spellController.setOpponentHit([&] () { voldemort.hit(); });
 
       harry.setSpellController(spellController);
       voldemort.setSpellController(spellController);

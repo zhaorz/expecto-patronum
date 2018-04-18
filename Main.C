@@ -62,12 +62,10 @@ int main()
 
         case sf::Keyboard::W:
           syntheticEvent.type = Wand::Event::Jump;
-          game.onWandInput(syntheticEvent);
           break;
 
         case sf::Keyboard::D:
           syntheticEvent.type = Wand::Event::Attack;
-          game.onWandInput(syntheticEvent);
           break;
 
         case sf::Keyboard::A:

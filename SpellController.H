@@ -31,7 +31,14 @@ namespace Game {
       sprite.scale(4.f, 4.f);
     }
 
+    const sf::Vector2f& getPosition() {
+      return sprite.getPosition();
+    }
+
     void update ( float elapsedTime ) {
+
+      sprite.move(elapsedTime * speed);
+
       totalElapsedTime += elapsedTime;
 
       if ( totalElapsedTime > framePeriod ) {
@@ -64,7 +71,11 @@ namespace Game {
 
     sf::Sprite sprite;
 
+    static const sf::Vector2f speed;  // Pixels per second
+
   };
+
+  const sf::Vector2f Spell::speed = sf::Vector2f(1000.f, 0.f);
 
   class SpellController {
   public:
@@ -78,10 +89,6 @@ namespace Game {
       if ( !attackTexture.loadFromFile(assetBasePath + "attack-spell.png") ) {
         cout << "Error loading attack spell texture" << endl;
       }
-
-      background.setPosition(sf::Vector2f(bbox.left, bbox.top));
-      background.setSize(sf::Vector2f(bbox.width, bbox.height));
-      background.setFillColor(sf::Color(126, 247, 210, 128));
     }
 
     void setPlayerHit ( function<void()> cb ) {
@@ -112,13 +119,20 @@ namespace Game {
     }
 
     void update( float elapsedTime ) {
-      for ( auto &spell : playerSpells ) {
-        spell.update(elapsedTime);
+      auto it = playerSpells.begin();
+      while (it != playerSpells.end()) {
+        it->update(elapsedTime);
+
+        if ( it->getPosition().x > bbox.left + bbox.width ) {
+          opponentHitCb();
+          it = playerSpells.erase(it);
+        } else {
+          ++it;
+        }
       }
     }
 
     void draw( std::shared_ptr<sf::RenderWindow> window ) {
-      window->draw(background);
 
       for ( auto &spell : playerSpells ) {
         spell.draw(window);
@@ -136,8 +150,6 @@ namespace Game {
     function<void()> opponentHitCb;
 
     sf::IntRect bbox;
-
-    sf::RectangleShape background;
 
     // Attack
     sf::Texture attackTexture;

@@ -131,6 +131,9 @@ namespace Game {
 
     void hit () {
       cout << "Character.hit" << endl;
+      nLives--;
+      sf::Vector2u heartSize = heartTexture.getSize();
+      heartSprite.setTextureRect(sf::IntRect(0, 0, nLives * heartSize.x, heartSize.y));
     }
 
   private:
