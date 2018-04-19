@@ -12,8 +12,8 @@ using std::thread;
 
 int main()
 {
-  int width = 1920;
-  int height = 1080;
+  int width = 800;
+  int height = 600;
 
   std::shared_ptr<sf::RenderWindow> window =
     std::make_shared<sf::RenderWindow>(sf::VideoMode(width, height), "SFML works!");

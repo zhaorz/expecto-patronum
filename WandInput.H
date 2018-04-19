@@ -90,7 +90,8 @@ namespace Wand {
       timer.expires_from_now(boost::posix_time::milliseconds(analysisInterval));
       timer.async_wait(boost::bind(&WandInput::analyze, this));
 
-      io.run();
+      // TODO: Re-enable
+      // io.run();
     }
 
     void analyze() {

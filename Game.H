@@ -15,9 +15,6 @@ using std::string;
 
 namespace Game {
 
-  const int windowWidth = 1920;
-  const int windowHeight = 1080;
-
   const string assetBasePath = "../assets/";
 
   class GameController {
@@ -26,11 +23,13 @@ namespace Game {
 
     GameController( std::shared_ptr<sf::RenderWindow> window )
       : window(window)
-      , harry(sf::IntRect(0, 0, 960, 1080),
+      , width(window->getSize().x)
+      , height(window->getSize().y)
+      , harry(sf::IntRect(0, 0, width / 2, height),
               assetBasePath,
               assetBasePath + "harry-default.png",
               "Harry")
-      , voldemort(sf::IntRect(960, 0, 960, 1080),
+      , voldemort(sf::IntRect(width / 2, 0, width / 2, height),
                   assetBasePath,
                   assetBasePath + "voldemort-default.png",
                   "Voldemort",
@@ -69,8 +68,8 @@ namespace Game {
       gameOverText.setFont(font);
       gameOverText.setCharacterSize(81);
       auto textBounds = gameOverText.getLocalBounds();
-      gameOverText.setPosition(sf::Vector2f(windowWidth / 2. - textBounds.width / 2,
-                                            windowHeight / 2. - textBounds.height / 2.));
+      gameOverText.setPosition(sf::Vector2f(width / 2. - textBounds.width / 2,
+                                            height / 2. - textBounds.height / 2.));
     }
 
     void draw () {
@@ -143,6 +142,9 @@ namespace Game {
   private:
 
     std::shared_ptr<sf::RenderWindow> window;
+
+    int width;
+    int height;
 
     // Background
     sf::Texture backgroundTexture;
