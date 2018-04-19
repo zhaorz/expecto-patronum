@@ -124,24 +124,44 @@ namespace Game {
     }
 
     void update ( float elapsedTime ) {
-      if ( isJumping ) velocity += elapsedTime * gravity;
-      position += elapsedTime * velocity;
+      switch ( state ) {
 
-      // Snap character back
-      if ( position.y + cHeight > ground ) {
-        position.y = ground - cHeight;
-        velocity = sf::Vector2f(0.f, 0.f);
-        isJumping = false;
+      case Jump:
+        velocity += elapsedTime * gravity;
+        position += elapsedTime * velocity;
+
+        // Snap character back
+        if ( position.y + cHeight > ground ) {
+          position.y = ground - cHeight;
+          velocity = sf::Vector2f(0.f, 0.f);
+          state = Idle;
+          sprite.setTexture(idleTexture);
+        }
+
+        sprite.setPosition(position);
+        bboxShape.setPosition(position);
+        break;
+
+      case Attack:
+      case Hit:
+        timeout -= elapsedTime;
+        if ( timeout < 0 ) {
+          state = Idle;
+          sprite.setTexture(idleTexture);
+        }
+        break;
+
+      case Idle:
+      case Dead:
+        break;
       }
-
-      sprite.setPosition(position);
-      bboxShape.setPosition(position);
     }
 
     void jump () {
-      if ( isJumping ) return;
+      if ( state != Idle ) return;
 
-      isJumping = true;
+      state = Jump;
+      sprite.setTexture(jumpTexture);
       velocity = jumpSpeed;
     }
 
@@ -150,8 +170,12 @@ namespace Game {
     }
 
     void attack () {
-      if ( !isJumping )
-        castAttack();
+      if ( state != Idle ) return;
+
+      state = Attack;
+      timeout = attackInterval;
+      sprite.setTexture(attackTexture);
+      castAttack();
     }
 
     void reflect () {
@@ -171,6 +195,10 @@ namespace Game {
       nLives--;
       sf::Vector2u heartSize = heartTexture.getSize();
       heartSprite.setTextureRect(sf::IntRect(0, 0, nLives * heartSize.x, heartSize.y));
+
+      state = Hit;
+      timeout = hitInterval;
+      sprite.setTexture(hitTexture);
     }
 
   private:
@@ -202,10 +230,16 @@ namespace Game {
 
     // Kinematics
     sf::Vector2f velocity;
-
-    // Jump mechanics
-    bool isJumping;
     float ground;
+
+    // Animation mechanics
+    bool isJumping;
+    State state;
+    float timeout;
+
+    // Animation duration, in seconds
+    float attackInterval = 0.4;
+    float hitInterval = 0.6;
 
     // Spell mechanics
     function<void()> castAttack;
@@ -219,7 +253,6 @@ namespace Game {
 
     sf::Sprite  sprite;
 
-    State state;
 
   };
 
