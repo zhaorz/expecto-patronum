@@ -112,20 +112,22 @@ int main(int argc, char** argv)
 
   if ( debug ) namedWindow("Clamped", 1);
 
+  Mat frame, downsize, gray, blurred, clamped;
+
   for( ;; ) {
 
-    Mat frame, gray;
     cap >> frame; // get a new frame from camera
-    cvtColor(frame, gray, COLOR_BGR2GRAY);
+
+    resize(frame, downsize, Size(), 0.5, 0.5, CV_INTER_LINEAR);
+
+    cvtColor(downsize, gray, COLOR_BGR2GRAY);
 
     // Apply a generous Gaussian blur
-    Mat blurred;
     GaussianBlur(gray, blurred, Size(69, 69), 0);
 
     // double thresh = thresholdValue( blurred );
 
     // Apply a threshold to extract very bright pixels
-    Mat clamped;
     threshold(blurred, clamped, 252, 255, THRESH_BINARY);
 
     // Find contours
@@ -147,7 +149,7 @@ int main(int argc, char** argv)
         // if ( e < 0.8 ) {          // e = 0.8 corresponds to b = 0.6 * a
         if ( e < 0.85 ) {          // e = 0.8 corresponds to b = 0.7 * a
           drawRotatedRect(frame, r, Scalar(0, 255, 0));
-          lights.push_back(r.center);
+          lights.push_back(2 * r.center);
         }
       }
     }

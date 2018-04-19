@@ -14,16 +14,6 @@ using std::vector;
 using std::cout;
 using std::endl;
 
-void drawRotatedRect(Mat& image, const RotatedRect& r, const Scalar& color)
-{
-  Point2f vertices[4];
-  r.points(vertices);
-
-  for (int i = 0; i < 4; i++) {
-    line(image, vertices[i], vertices[(i+1)%4], color);
-  }
-}
-
 // Eccentricity of a perfect square (i.e. bounding rect of a circle) is zero.
 float eccentricity(const RotatedRect& r)
 {
@@ -51,6 +41,8 @@ namespace Wand {
     typedef std::chrono::milliseconds ms;
     typedef std::chrono::high_resolution_clock Clock;
 
+    const double scale = .5;
+
     RawInput() {
       cout << "RawInput : initialized" << endl;
     };
@@ -66,18 +58,22 @@ namespace Wand {
         exit(1);
       }
 
+      Mat frame, downsize, gray, blurred, clamped;
+
       for( ;; ) {
 
-        Mat frame, gray;
+        auto start = Clock::now();
+
         cap >> frame; // get a new frame from camera
-        cvtColor(frame, gray, COLOR_BGR2GRAY);
+
+        resize(frame, downsize, Size(), scale, scale, CV_INTER_LINEAR);
+
+        cvtColor(downsize, gray, COLOR_BGR2GRAY);
 
         // Apply a generous Gaussian blur
-        Mat blurred;
         GaussianBlur(gray, blurred, Size(69, 69), 0);
 
         // Apply a threshold to extract very bright pixels
-        Mat clamped;
         threshold(blurred, clamped, 252, 255, THRESH_BINARY);
 
         // Find contours
@@ -86,9 +82,7 @@ namespace Wand {
         findContours(clamped, contours, hierarchy, RETR_EXTERNAL, CHAIN_APPROX_SIMPLE, Point(0, 0));
 
         // Keep track of 'round enough' contours
-        vector<Point> lights;
         for ( int i = 0; i < contours.size(); i++ ) {
-          drawContours(frame, contours, i, Scalar(0, 0, 255), 2, 8, hierarchy, 0, Point());
 
           // TODO: Clean up, fitEllipse needs at least 5 points
           if ( contours[i].size() > 5 ) {
@@ -98,15 +92,17 @@ namespace Wand {
             float e = eccentricity(r);
             // if ( e < 0.8 ) {          // e = 0.8 corresponds to b = 0.6 * a
             if ( e < 0.85 ) {          // e = 0.8 corresponds to b = 0.7 * a
-              drawRotatedRect(frame, r, Scalar(0, 255, 0));
-              lights.push_back(r.center);
-
               // Flipping the x coordinate mirrors the movement
-              callback((frame.cols - r.center.x) / frame.cols, r.center.y / frame.rows,
+              callback((downsize.cols - r.center.x) / downsize.cols, r.center.y / downsize.rows,
                        std::chrono::duration_cast<ms>(Clock::now().time_since_epoch()).count());
             }
           }
         }
+
+        auto duration = Clock::now() - start;
+
+        cout << "RawInput : frame processed ("
+             << std::chrono::duration_cast<ms>(duration).count() << "ms)" << endl;
 
       }
 
