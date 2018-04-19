@@ -35,8 +35,8 @@ int main ( int argc, char** argv )
     cout << "Using small window" << endl;
   }
 
-  int width = 1920;
-  int height = 1080;
+  int width = 1280;
+  int height = 1024;
 
   std::shared_ptr<sf::RenderWindow> window;
   if ( debug ) {

@@ -77,9 +77,9 @@ namespace Game {
       cHeight = bounds.height;
 
       if ( isOpponent ) {
-        position = sf::Vector2f(bLeft + bWidth - bounds.width - margin, ground - bounds.height);
+        position = sf::Vector2f(bLeft + bWidth - bounds.width, ground - bounds.height);
       } else {
-        position = sf::Vector2f(bLeft + margin, ground - bounds.height);
+        position = sf::Vector2f(bLeft, ground - bounds.height);
       }
 
       sprite.setPosition(position);
@@ -89,7 +89,7 @@ namespace Game {
       // Game elements ------------------------------------------------------------------------------
 
       nameText.setString(name);
-      nameText.setCharacterSize(63);
+      nameText.setCharacterSize(45);
       nameText.setPosition(sf::Vector2f(bLeft + margin, bTop + margin));
 
       sf::Vector2u heartSize = heartTexture.getSize();

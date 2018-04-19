@@ -50,7 +50,7 @@ namespace Game {
                         assetBasePath)
       , wandDisplay(width / 2., height * 0.9)
     {
-      if ( !backgroundTexture.loadFromFile(assetBasePath + "chamber-of-secrets.png") ) {
+      if ( !backgroundTexture.loadFromFile(assetBasePath + "chamber-1280.png") ) {
         cout << "Error loading background texture" << endl;
       }
 
@@ -92,14 +92,14 @@ namespace Game {
 
       countdownText.setString(std::to_string((int) std::ceil(loadingTimeout)));
       countdownText.setFont(font);
-      countdownText.setCharacterSize(108);
+      countdownText.setCharacterSize(81);
       textBounds = countdownText.getLocalBounds();
       countdownText.setPosition(sf::Vector2f(width / 2. - textBounds.width / 2,
                                              height / 2. - textBounds.height / 2.));
 
       jumpTutorialText.setString("Wave up to jump");
       jumpTutorialText.setFont(font);
-      jumpTutorialText.setCharacterSize(72);
+      jumpTutorialText.setCharacterSize(56);
       textBounds = jumpTutorialText.getLocalBounds();
       jumpTutorialText.setPosition(sf::Vector2f(width / 2. - textBounds.width / 2,
                                                 height * 0.1));
@@ -107,7 +107,7 @@ namespace Game {
 
       attackTutorialText.setString("Wave right to attack");
       attackTutorialText.setFont(font);
-      attackTutorialText.setCharacterSize(72);
+      attackTutorialText.setCharacterSize(56);
       textBounds = attackTutorialText.getLocalBounds();
       attackTutorialText.setPosition(sf::Vector2f(width / 2. - textBounds.width / 2,
                                                   height * 0.8));
