@@ -7,6 +7,7 @@
 #include "Character.H"
 #include "SpellController.H"
 #include "Voldemort.H"
+#include "WandDisplay.H"
 #include "WandInput.H"
 
 using std::cout;
@@ -39,6 +40,7 @@ namespace Game {
                   true)         // Voldemort is reversed
       , spellController(sf::IntRect(0.1 * width, 0.58 * height, 0.8 * width, 50),
                         assetBasePath)
+      , wandDisplay(width / 2., height * 0.9)
       , gameOver(false)
     {
       if ( !backgroundTexture.loadFromFile(assetBasePath + "chamber-of-secrets.png") ) {
@@ -90,6 +92,8 @@ namespace Game {
 
       spellController.draw(window);
 
+      wandDisplay.draw(window);
+
       if ( gameOver ) {
         window->draw(gameOverText);
       }
@@ -103,6 +107,7 @@ namespace Game {
         voldemort.update(elapsedTime);
         voldemortController.update(elapsedTime);
         spellController.update(elapsedTime);
+        wandDisplay.update(elapsedTime);
       }
     }
 
@@ -120,7 +125,7 @@ namespace Game {
       switch ( event.type ) {
 
       case Wand::Event::WandPoint:
-        // cout << "GameController.onWandInput : WandPoint" << endl;
+        wandDisplay.updateWandPoint(event.wandPoint.x, event.wandPoint.y);
         break;
 
       case Wand::Event::Jump:
@@ -169,6 +174,8 @@ namespace Game {
     Voldemort voldemortController;
 
     SpellController spellController;
+
+    WandDisplay wandDisplay;
 
     bool gameOver;
     sf::Text gameOverText;
