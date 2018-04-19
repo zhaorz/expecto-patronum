@@ -74,6 +74,8 @@ namespace Game {
       float scale = std::max(scaleX, scaleY);
       backgroundSprite.scale(scale, scale);
 
+      wandDisplay.setFont(font);
+
       gameOverText.setString("Game over");
       gameOverText.setFont(font);
       gameOverText.setCharacterSize(81);

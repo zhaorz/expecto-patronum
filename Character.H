@@ -77,9 +77,9 @@ namespace Game {
       cHeight = bounds.height;
 
       if ( isOpponent ) {
-        position = sf::Vector2f(bLeft + bWidth - bounds.width - 100.f, ground - bounds.height);
+        position = sf::Vector2f(bLeft + bWidth - bounds.width - margin, ground - bounds.height);
       } else {
-        position = sf::Vector2f(bLeft + 100.f, ground - bounds.height);
+        position = sf::Vector2f(bLeft + margin, ground - bounds.height);
       }
 
       sprite.setPosition(position);
