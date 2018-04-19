@@ -81,12 +81,12 @@ namespace Wand {
         GaussianBlur(gray, blurred, Size(15, 15), 0);
 
         // Apply a threshold to extract very bright pixels
-        threshold(blurred, clamped, 250, 255, THRESH_BINARY);
+        threshold(blurred, clamped, 245, 255, THRESH_BINARY);
 
-        pMOG->apply(clamped, fg);
+        // pMOG->apply(clamped, fg);
 
-        GaussianBlur(fg, blurred, Size(31, 31), 0);
-        threshold(blurred, clamped, 240, 255, THRESH_BINARY);
+        // GaussianBlur(fg, blurred, Size(31, 31), 0);
+        // threshold(blurred, clamped, 240, 255, THRESH_BINARY);
 
         // Find contours
         vector< vector<Point> > contours;
