@@ -1,4 +1,5 @@
 #include "opencv2/opencv.hpp"
+#include "opencv2/video/background_segm.hpp"
 
 #include "cxxopts.hpp"
 
@@ -61,9 +62,14 @@ namespace Wand {
       cap.set(CV_CAP_PROP_FRAME_WIDTH, 320);
       cap.set(CV_CAP_PROP_FRAME_HEIGHT, 240);
 
-      Mat frame, gray, blurred, clamped;
+      Ptr<BackgroundSubtractor> pMOG;          // MOG Background subtractor
+      pMOG = createBackgroundSubtractorMOG2(); // MOG approach
 
-      for( int thresh = 230 ; thresh < 255; thresh += 3 ) {
+      Mat frame, gray, blurred, clamped, fg;
+
+      int thresh = 245;
+      for ( ; ; ) {
+      // for( int thresh = 230 ; thresh < 255; thresh += 3 ) {
 
         auto start = Clock::now();
 
@@ -77,10 +83,12 @@ namespace Wand {
         // Apply a threshold to extract very bright pixels
         threshold(blurred, clamped, thresh, 255, THRESH_BINARY);
 
+        pMOG->apply(clamped, fg);
+
         // Find contours
         vector< vector<Point> > contours;
         vector<Vec4i> hierarchy;
-        findContours(clamped, contours, hierarchy, RETR_EXTERNAL, CHAIN_APPROX_SIMPLE, Point(0, 0));
+        findContours(fg, contours, hierarchy, RETR_EXTERNAL, CHAIN_APPROX_SIMPLE, Point(0, 0));
 
         int nDetected = 0;
 
@@ -111,9 +119,10 @@ namespace Wand {
              << ", nDetected = " << nDetected
              << endl;
 
-        imwrite("frame-" + std::to_string(thresh) + ".jpg", frame);
-        imwrite("blurred-" + std::to_string(thresh) + ".jpg", blurred);
-        imwrite("clamped-" + std::to_string(thresh) + ".jpg", clamped);
+        // imwrite("frame-" + std::to_string(thresh) + ".jpg", frame);
+        // imwrite("blurred-" + std::to_string(thresh) + ".jpg", blurred);
+        // imwrite("clamped-" + std::to_string(thresh) + ".jpg", clamped);
+        // imwrite("fg-" + std::to_string(thresh) + ".jpg", fg);
 
       }
 
