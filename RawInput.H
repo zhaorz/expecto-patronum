@@ -63,7 +63,7 @@ namespace Wand {
 
       Mat frame, gray, blurred, clamped;
 
-      for( ;; ) {
+      for( int thresh = 230 ; thresh < 255; thresh += 3 ) {
 
         auto start = Clock::now();
 
@@ -75,12 +75,14 @@ namespace Wand {
         GaussianBlur(gray, blurred, Size(15, 15), 0);
 
         // Apply a threshold to extract very bright pixels
-        threshold(blurred, clamped, 240, 255, THRESH_BINARY);
+        threshold(blurred, clamped, thresh, 255, THRESH_BINARY);
 
         // Find contours
         vector< vector<Point> > contours;
         vector<Vec4i> hierarchy;
         findContours(clamped, contours, hierarchy, RETR_EXTERNAL, CHAIN_APPROX_SIMPLE, Point(0, 0));
+
+        int nDetected = 0;
 
         // Keep track of 'round enough' contours
         for ( int i = 0; i < contours.size(); i++ ) {
@@ -96,6 +98,7 @@ namespace Wand {
               // Flipping the x coordinate mirrors the movement
               callback((frame.cols - r.center.x) / frame.cols, r.center.y / frame.rows,
                        std::chrono::duration_cast<ms>(Clock::now().time_since_epoch()).count());
+              nDetected++;
             }
           }
         }
@@ -103,15 +106,18 @@ namespace Wand {
         auto duration = Clock::now() - start;
 
         cout << "RawInput : frame processed ("
-             << std::chrono::duration_cast<ms>(duration).count() << "ms)" << endl;
+             << std::chrono::duration_cast<ms>(duration).count() << "ms)"
+             << " thresh = " << thresh
+             << ", nDetected = " << nDetected
+             << endl;
 
-        imwrite("frame.jpg", frame);
-        imwrite("blurred.jpg", blurred);
-        imwrite("clamped.jpg", clamped);
-
-        exit(1);
+        imwrite("frame-" + std::to_string(thresh) + ".jpg", frame);
+        imwrite("blurred-" + std::to_string(thresh) + ".jpg", blurred);
+        imwrite("clamped-" + std::to_string(thresh) + ".jpg", clamped);
 
       }
+
+      exit(0);
 
     }
 
