@@ -81,17 +81,17 @@ namespace Wand {
         GaussianBlur(gray, blurred, Size(15, 15), 0);
 
         // Apply a threshold to extract very bright pixels
-        threshold(blurred, clamped, 250, 255, THRESH_BINARY);
+        threshold(blurred, clamped, 245, 255, THRESH_BINARY);
 
         pMOG->apply(clamped, fg);
 
         GaussianBlur(fg, blurred, Size(15, 15), 0);
-        threshold(blurred, clamped, 240, 255, THRESH_BINARY);
+        threshold(blurred, clamped, 235, 255, THRESH_BINARY);
 
         // Find contours
         vector< vector<Point> > contours;
         vector<Vec4i> hierarchy;
-        findContours(fg, contours, hierarchy, RETR_EXTERNAL, CHAIN_APPROX_SIMPLE, Point(0, 0));
+        findContours(clamped, contours, hierarchy, RETR_EXTERNAL, CHAIN_APPROX_SIMPLE, Point(0, 0));
 
         int nDetected = 0;
 
