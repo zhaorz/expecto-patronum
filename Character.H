@@ -67,8 +67,13 @@ namespace Game {
 
       sprite.setPosition(position);
 
-      heartTexture.setRepeated(true);
-      heartSprite.setTexture(heartTexture);
+      heartTexture.setRepeated(true); heartSprite.setTexture(heartTexture);
+
+      bboxShape.setPosition(position);
+      bboxShape.setSize(sf::Vector2f(bounds.width, bounds.height));
+      bboxShape.setFillColor(sf::Color(0, 0, 0, 0));
+      bboxShape.setOutlineThickness(5.f);
+      bboxShape.setOutlineColor(sf::Color(255, 0, 0, 255));
 
       // Game elements ------------------------------------------------------------------------------
 
@@ -113,6 +118,7 @@ namespace Game {
       }
 
       sprite.setPosition(position);
+      bboxShape.setPosition(position);
     }
 
     void jump () {
@@ -139,6 +145,8 @@ namespace Game {
       window->draw(sprite);
       window->draw(nameText);
       window->draw(heartSprite);
+
+      window->draw(bboxShape);
     }
 
     void hit () {
@@ -155,6 +163,8 @@ namespace Game {
     int bTop;
     int bWidth;
     int bHeight;
+
+    sf::RectangleShape bboxShape;
 
     // Title
     const string name;
