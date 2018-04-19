@@ -54,10 +54,6 @@ namespace Game {
         cout << "Error loading background texture" << endl;
       }
 
-      if ( !tutorialTexture.loadFromFile(assetBasePath + "tutorial.png") ) {
-        cout << "Error loading tutorial texture" << endl;
-      }
-
       if ( !font.loadFromFile(assetBasePath + "8bit.ttf") ) {
         cout << "Error loading font" << endl;
       }
@@ -85,13 +81,6 @@ namespace Game {
       float scale = std::max(scaleX, scaleY);
       backgroundSprite.scale(scale, scale);
 
-      auto tutorialSize = tutorialTexture.getSize();
-      tutorialSprite.setTexture(tutorialTexture);
-      scaleX = (float) width / tutorialSize.x;
-      scaleY = (float) height / tutorialSize.y;
-      scale = std::max(scaleX, scaleY);
-      tutorialSprite.scale(scale, scale);
-
       wandDisplay.setFont(font);
 
       gameOverText.setString("Game over");
@@ -108,8 +97,26 @@ namespace Game {
       countdownText.setPosition(sf::Vector2f(width / 2. - textBounds.width / 2,
                                              height / 2. - textBounds.height / 2.));
 
+      jumpTutorialText.setString("Wave up to jump");
+      jumpTutorialText.setFont(font);
+      jumpTutorialText.setCharacterSize(72);
+      textBounds = jumpTutorialText.getLocalBounds();
+      jumpTutorialText.setPosition(sf::Vector2f(width / 2. - textBounds.width / 2,
+                                                height * 0.1));
+      jumpTutorialText.setFillColor(sf::Color(72, 255, 157, 255));
+
+      attackTutorialText.setString("Wave right to attack");
+      attackTutorialText.setFont(font);
+      attackTutorialText.setCharacterSize(72);
+      textBounds = attackTutorialText.getLocalBounds();
+      attackTutorialText.setPosition(sf::Vector2f(width / 2. - textBounds.width / 2,
+                                                  height * 0.8));
+      attackTutorialText.setFillColor(sf::Color(255, 102, 63, 255));
+
       cout << "Game : initialized, dimensions = " << width << "x" << height << endl;
     }
+
+    GameController ( const GameController& other ) = delete;
 
     void draw () {
       window->draw(backgroundSprite);
@@ -117,7 +124,8 @@ namespace Game {
       switch ( phase ) {
 
       case Loading:
-        window->draw(tutorialSprite);
+        window->draw(jumpTutorialText);
+        window->draw(attackTutorialText);
         window->draw(countdownText);
         break;
 
@@ -228,12 +236,12 @@ namespace Game {
     int height;
     float ground;               // Baseline of the characters
 
+    const float loadingInterval = 5.;
+    float loadingTimeout;
+
     // Background
     sf::Texture backgroundTexture;
     sf::Sprite  backgroundSprite;
-
-    sf::Texture tutorialTexture;
-    sf::Sprite  tutorialSprite;
 
     // Characters
     Character harry;
@@ -249,8 +257,8 @@ namespace Game {
     sf::Text gameOverText;
     sf::Text countdownText;
 
-    const float loadingInterval = 5.;
-    float loadingTimeout;
+    sf::Text jumpTutorialText;
+    sf::Text attackTutorialText;
 
     // Shared assets
     sf::Font font;
