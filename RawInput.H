@@ -68,7 +68,8 @@ namespace Wand {
       Mat frame, gray, blurred, clamped, fg;
 
       int thresh = 245;
-      for ( ; ; ) {
+      for ( ;; ) {
+      // for ( int k = 0; k < 30; k++ ) {
       // for( int thresh = 230 ; thresh < 255; thresh += 3 ) {
 
         auto start = Clock::now();
@@ -84,6 +85,9 @@ namespace Wand {
         threshold(blurred, clamped, thresh, 255, THRESH_BINARY);
 
         pMOG->apply(clamped, fg);
+
+        GaussianBlur(fg, blurred, Size(15, 15), 0);
+        threshold(blurred, clamped, 252, 255, THRESH_BINARY);
 
         // Find contours
         vector< vector<Point> > contours;
@@ -115,14 +119,13 @@ namespace Wand {
 
         cout << "RawInput : frame processed ("
              << std::chrono::duration_cast<ms>(duration).count() << "ms)"
-             << " thresh = " << thresh
              << ", nDetected = " << nDetected
              << endl;
 
-        // imwrite("frame-" + std::to_string(thresh) + ".jpg", frame);
-        // imwrite("blurred-" + std::to_string(thresh) + ".jpg", blurred);
-        // imwrite("clamped-" + std::to_string(thresh) + ".jpg", clamped);
-        // imwrite("fg-" + std::to_string(thresh) + ".jpg", fg);
+        // imwrite("frame-" + std::to_string(k) + ".jpg", frame);
+        // imwrite("blurred-" + std::to_string(k) + ".jpg", blurred);
+        // imwrite("clamped-" + std::to_string(k) + ".jpg", clamped);
+        // imwrite("fg-" + std::to_string(k) + ".jpg", fg);
 
       }
 
