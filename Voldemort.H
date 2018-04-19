@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstdlib>
 #include <functional>
 #include <string>
 
@@ -9,6 +10,10 @@ using std::cout;
 using std::endl;
 using std::function;
 using std::string;
+
+double uniformRandom () {
+  return static_cast<double>(std::rand()) / RAND_MAX;
+}
 
 namespace Game {
 
@@ -36,19 +41,19 @@ namespace Game {
 
       if ( jumpTimeout < 0.f ) {
         jumpCb();
-        jumpTimeout = jumpInterval;
+        jumpTimeout = jumpInterval * uniformRandom();
       }
 
       if ( attackTimeout < 0.f ) {
         attackCb();
-        attackTimeout = attackInterval;
+        attackTimeout = attackInterval * uniformRandom();
       }
     }
 
   private:
 
-    static constexpr float jumpInterval = 10.f; // seconds
-    static constexpr float attackInterval = 10.f; // seconds
+    static constexpr float jumpInterval = 6.f; // seconds
+    static constexpr float attackInterval = 5.f; // seconds
 
     float jumpTimeout;
     float attackTimeout;

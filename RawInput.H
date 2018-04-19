@@ -116,10 +116,10 @@ namespace Wand {
 
         auto duration = Clock::now() - start;
 
-        cout << "RawInput : frame processed ("
-             << std::chrono::duration_cast<ms>(duration).count() << "ms)"
-             << ", nDetected = " << nDetected
-             << endl;
+        // cout << "RawInput : frame processed ("
+        //      << std::chrono::duration_cast<ms>(duration).count() << "ms)"
+        //      << ", nDetected = " << nDetected
+        //      << endl;
 
         // imwrite("frame-" + std::to_string(k) + ".jpg", frame);
         // imwrite("blurred-" + std::to_string(k) + ".jpg", blurred);
