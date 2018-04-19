@@ -16,8 +16,9 @@ int main()
   int height = 600;
 
   std::shared_ptr<sf::RenderWindow> window =
-    std::make_shared<sf::RenderWindow>(sf::VideoMode(width, height), "SFML works!");
+    std::make_shared<sf::RenderWindow>(sf::VideoMode(width, height), "Expecto Patronum");
   window->setFramerateLimit(60);
+  window->setKeyRepeatEnabled(false);
 
   sf::CircleShape shape(20.f);
 
@@ -95,8 +96,11 @@ int main()
 
     window->clear();
 
+    std::cout << "drawing ..." << std::endl;
     game.draw();
+    std::cout << "updating ..." << std::endl;
     game.update(clock.getElapsedTime().asSeconds());
+    std::cout << "displaying ..." << std::endl;
     clock.restart();
 
     window->display();
