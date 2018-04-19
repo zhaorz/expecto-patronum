@@ -54,6 +54,10 @@ namespace Game {
         cout << "Error loading background texture" << endl;
       }
 
+      if ( !tutorialTexture.loadFromFile(assetBasePath + "tutorial.png") ) {
+        cout << "Error loading tutorial texture" << endl;
+      }
+
       if ( !font.loadFromFile(assetBasePath + "8bit.ttf") ) {
         cout << "Error loading font" << endl;
       }
@@ -81,6 +85,13 @@ namespace Game {
       float scale = std::max(scaleX, scaleY);
       backgroundSprite.scale(scale, scale);
 
+      auto tutorialSize = tutorialTexture.getSize();
+      tutorialSprite.setTexture(tutorialTexture);
+      scaleX = (float) width / tutorialSize.x;
+      scaleY = (float) height / tutorialSize.y;
+      scale = std::max(scaleX, scaleY);
+      tutorialSprite.scale(scale, scale);
+
       wandDisplay.setFont(font);
 
       gameOverText.setString("Game over");
@@ -103,23 +114,25 @@ namespace Game {
     void draw () {
       window->draw(backgroundSprite);
 
-      harry.draw(window);
-      voldemort.draw(window);
-
-      spellController.draw(window);
-
-      wandDisplay.draw(window);
-
       switch ( phase ) {
 
       case Loading:
+        window->draw(tutorialSprite);
         window->draw(countdownText);
         break;
 
       case Playing:
+        harry.draw(window);
+        voldemort.draw(window);
+        spellController.draw(window);
+        wandDisplay.draw(window);
         break;
 
       case Complete:
+        harry.draw(window);
+        voldemort.draw(window);
+        spellController.draw(window);
+        wandDisplay.draw(window);
         window->draw(gameOverText);
         break;
 
@@ -218,6 +231,9 @@ namespace Game {
     // Background
     sf::Texture backgroundTexture;
     sf::Sprite  backgroundSprite;
+
+    sf::Texture tutorialTexture;
+    sf::Sprite  tutorialSprite;
 
     // Characters
     Character harry;
