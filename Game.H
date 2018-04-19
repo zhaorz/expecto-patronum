@@ -52,6 +52,10 @@ namespace Game {
 
       spellController.setPlayerHit([&] () { harry.hit(); });
       spellController.setOpponentHit([&] () { voldemort.hit(); });
+      spellController.setPlayerIntersect([&] ( const sf::FloatRect& box )
+                                         { return harry.intersect(box); });
+      spellController.setOpponentIntersect([&] ( const sf::FloatRect& box )
+                                           { return voldemort.intersect(box); });
 
       harry.setSpellController(spellController);
       voldemort.setSpellController(spellController);

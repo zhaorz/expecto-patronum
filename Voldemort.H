@@ -19,6 +19,7 @@ namespace Game {
 
     Voldemort ()
       : jumpTimeout(jumpInterval)
+      , attackTimeout(attackInterval)
     {}
 
     void setAttack( function<void()> cb ) {

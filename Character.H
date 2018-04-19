@@ -15,7 +15,8 @@ using std::string;
 namespace Game {
 
   // Pixels per second^2
-  const sf::Vector2f gravity = sf::Vector2f(0., 2000.f);
+  const sf::Vector2f gravity = sf::Vector2f(0., 5000.f);
+  const sf::Vector2f jumpSpeed = sf::Vector2f(0., -2000.f);
 
   const float margin = 50.f;
 
@@ -51,15 +52,17 @@ namespace Game {
       // Sprite initialization ----------------------------------------------------------------------
 
       sprite.setTexture(texture);
-      sf::IntRect rect = sprite.getTextureRect();
-      cWidth = rect.width;
-      cHeight = rect.height;
+      sprite.scale(0.8, 0.8);
+      auto rect = sprite.getTextureRect();
+      auto bounds = sprite.getGlobalBounds();
+      cWidth = bounds.width;
+      cHeight = bounds.height;
 
       if ( reversed ) {
         sprite.setTextureRect(sf::IntRect(rect.width, 0, -rect.width, rect.height));
-        position = sf::Vector2f(bLeft + bWidth - rect.width - 100.f, ground - rect.height);
+        position = sf::Vector2f(bLeft + bWidth - bounds.width - 100.f, ground - bounds.height);
       } else {
-        position = sf::Vector2f(bLeft + 100.f, ground - rect.height);
+        position = sf::Vector2f(bLeft + 100.f, ground - bounds.height);
       }
 
       sprite.setPosition(position);
@@ -116,11 +119,16 @@ namespace Game {
       if ( isJumping ) return;
 
       isJumping = true;
-      velocity = sf::Vector2f(0., -1000.f);
+      velocity = jumpSpeed;
+    }
+
+    bool intersect( const sf::FloatRect& box ) {
+      return sprite.getGlobalBounds().intersects(box);
     }
 
     void attack () {
-      castAttack();
+      if ( !isJumping )
+        castAttack();
     }
 
     void reflect () {

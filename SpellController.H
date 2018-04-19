@@ -41,6 +41,10 @@ namespace Game {
       return sprite.getPosition();
     }
 
+    sf::FloatRect getGlobalBounds() {
+      return sprite.getGlobalBounds();
+    }
+
     void hide () {
       hidden = true;
     }
@@ -114,6 +118,10 @@ namespace Game {
 
     const sf::Vector2f& getPosition() {
       return sprite.getPosition();
+    }
+
+    sf::FloatRect getGlobalBounds() {
+      return sprite.getGlobalBounds();
     }
 
     void update ( float elapsedTime ) {
@@ -194,6 +202,14 @@ namespace Game {
       opponentHitCb = cb;
     }
 
+    void setPlayerIntersect ( function<bool(const sf::FloatRect&)> cb ) {
+      playerIntersect = cb;
+    }
+
+    void setOpponentIntersect ( function<bool(const sf::FloatRect&)> cb ) {
+      opponentIntersect = cb;
+    }
+
     void castPlayerAttack () {
       Spell spell(playerSpellOrigin, playerAttackTexture);
       playerSpells.push_back(std::move(spell));
@@ -217,7 +233,7 @@ namespace Game {
       while (it != playerSpells.end()) {
         it->update(elapsedTime);
 
-        if ( it->getPosition().x > bbox.left + bbox.width ) {
+        if ( opponentIntersect(it->getGlobalBounds()) ) {
           opponentHitCb();
           it = playerSpells.erase(it);
         } else if ( it->hidden ) {
@@ -231,7 +247,7 @@ namespace Game {
       while (it != opponentSpells.end()) {
         it->update(elapsedTime);
 
-        if ( it->getPosition().x < bbox.left ) {
+        if ( playerIntersect(it->getGlobalBounds()) ) {
           playerHitCb();
           it = opponentSpells.erase(it);
         } else if ( it->hidden ) {
@@ -300,6 +316,9 @@ namespace Game {
 
     function<void()> playerHitCb;
     function<void()> opponentHitCb;
+
+    function<bool(const sf::FloatRect&)> playerIntersect;
+    function<bool(const sf::FloatRect&)> opponentIntersect;
 
     sf::IntRect bbox;
 
