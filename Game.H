@@ -27,11 +27,11 @@ namespace Game {
       , height(window->getSize().y)
       , harry(sf::IntRect(0, 0, width / 2, height),
               assetBasePath,
-              assetBasePath + "harry-default.png",
+              assetBasePath + "hp/HP_Idle_Still.png",
               "Harry")
       , voldemort(sf::IntRect(width / 2, 0, width / 2, height),
                   assetBasePath,
-                  assetBasePath + "voldemort-default.png",
+                  assetBasePath + "vold/VOLD_Idle_Still.png",
                   "Voldemort",
                   true)         // Voldemort is reversed
       , spellController(sf::IntRect(200, 600, 1520, 50),

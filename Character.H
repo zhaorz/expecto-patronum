@@ -20,6 +20,11 @@ namespace Game {
 
   const float margin = 50.f;
 
+  template<typename T>
+  sf::Vector2f midpoint ( const sf::Rect<T>& box ) {
+    return sf::Vector2f(box.left + box.width / 2, box.top + box.height / 2);
+  }
+
   class Character {
   public:
 
@@ -39,7 +44,6 @@ namespace Game {
       , ground(950.f)
       , isJumping(false)
       , isOpponent(isOpponent)
-      , reversed(isOpponent)
     {
       if ( !texture.loadFromFile(pathToSprite) ) {
         cout << "Error loading Character texture" << endl;
@@ -58,8 +62,7 @@ namespace Game {
       cWidth = bounds.width;
       cHeight = bounds.height;
 
-      if ( reversed ) {
-        sprite.setTextureRect(sf::IntRect(rect.width, 0, -rect.width, rect.height));
+      if ( isOpponent ) {
         position = sf::Vector2f(bLeft + bWidth - bounds.width - 100.f, ground - bounds.height);
       } else {
         position = sf::Vector2f(bLeft + 100.f, ground - bounds.height);
@@ -129,7 +132,7 @@ namespace Game {
     }
 
     bool intersect( const sf::FloatRect& box ) {
-      return sprite.getGlobalBounds().intersects(box);
+      return sprite.getGlobalBounds().contains(midpoint(box));
     }
 
     void attack () {
@@ -146,7 +149,8 @@ namespace Game {
       window->draw(nameText);
       window->draw(heartSprite);
 
-      window->draw(bboxShape);
+      // Debugging bbox
+      // window->draw(bboxShape);
     }
 
     void hit () {
@@ -180,7 +184,6 @@ namespace Game {
     int cHeight;
 
     sf::Vector2f position;
-    bool reversed;
     bool isOpponent;
 
     // Kinematics
