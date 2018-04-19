@@ -50,7 +50,7 @@ namespace Game {
     static constexpr float jumpInterval = 10.f; // seconds
     float jumpTimeout;
 
-    static constexpr float attackInterval = 2.f; // seconds
+    static constexpr float attackInterval = 3.f; // seconds
     float attackTimeout;
 
     function<void()> attackCb;

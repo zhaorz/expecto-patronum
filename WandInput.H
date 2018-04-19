@@ -59,8 +59,8 @@ namespace Wand {
 
     typedef pair<pair<double, double>, pair<double, double>> dxdyRange;
 
-    static const int analysisInterval = 50;    // Milliseconds
-    static const int analysisWindow = 500;     // Milliseconds
+    static const int analysisInterval = 25;    // Milliseconds
+    static const int analysisWindow = 300;     // Milliseconds
 
     static const unordered_map<Event::EventType, dxdyRange> analysisThresholds;
 
@@ -133,7 +133,9 @@ namespace Wand {
         std::tie(dy0, dy1) = range.second;
 
         if ( (dx0 < dx && dx < dx1) && (dy0 < dy && dy < dy1) ) {
-          std::cout << "WandInput::analyze : triggered : " << e->first << std::endl;
+          std::cout << "WandInput::analyze : triggered : " << e->first
+                    << " dx, dy = " << dx << ", " << dy
+                    << std::endl;
 
           Event event;
           event.type = e->first;
@@ -198,8 +200,7 @@ namespace Wand {
   };
 
   const unordered_map<Event::EventType, WandInput::dxdyRange> WandInput::analysisThresholds = {
-    { Event::Jump,    { { -0.1,  0.1 }, { -1.0, -0.3 } }},
-    { Event::Attack,  { {  0.3,  1.0 }, { -1.0, -0.3 } }},
-    { Event::Reflect, { { -1.0, -0.3 }, {  0.3,  1.0 } }},
+    { Event::Jump,    { {  -0.2,  0.2 }, {  -1.0,  -0.3 } }},
+    { Event::Attack,  { {  0.15,  1.0 }, {  -0.5,   0.5 } }},
   };
 }
