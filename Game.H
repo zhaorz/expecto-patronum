@@ -25,16 +25,19 @@ namespace Game {
       : window(window)
       , width(window->getSize().x)
       , height(window->getSize().y)
+      , ground(height * 0.8)
       , harry(sf::IntRect(0, 0, width / 2, height),
+              ground,
               assetBasePath,
               assetBasePath + "hp/HP_Idle_Still.png",
               "Harry")
       , voldemort(sf::IntRect(width / 2, 0, width / 2, height),
+                  ground,
                   assetBasePath,
                   assetBasePath + "vold/VOLD_Idle_Still.png",
                   "Voldemort",
                   true)         // Voldemort is reversed
-      , spellController(sf::IntRect(200, 600, 1520, 50),
+      , spellController(sf::IntRect(0.1 * width, 0.64 * height, 0.8 * width, 50),
                         assetBasePath)
       , gameOver(false)
     {
@@ -62,7 +65,12 @@ namespace Game {
       voldemortController.setAttack([&] () { voldemort.attack(); });
       voldemortController.setJump([&] () { voldemort.jump(); });
 
+      auto backgroundSize = backgroundTexture.getSize();
       backgroundSprite.setTexture(backgroundTexture);
+      float scaleX = (float) width / backgroundSize.x;
+      float scaleY = (float) height / backgroundSize.y;
+      float scale = std::max(scaleX, scaleY);
+      backgroundSprite.scale(scale, scale);
 
       gameOverText.setString("Game over");
       gameOverText.setFont(font);
@@ -70,6 +78,8 @@ namespace Game {
       auto textBounds = gameOverText.getLocalBounds();
       gameOverText.setPosition(sf::Vector2f(width / 2. - textBounds.width / 2,
                                             height / 2. - textBounds.height / 2.));
+
+      cout << "Game : initialized, dimensions = " << width << "x" << height << endl;
     }
 
     void draw () {
@@ -145,6 +155,7 @@ namespace Game {
 
     int width;
     int height;
+    float ground;               // Baseline of the characters
 
     // Background
     sf::Texture backgroundTexture;

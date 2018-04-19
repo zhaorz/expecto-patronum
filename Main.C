@@ -16,9 +16,12 @@ int main()
   int height = 1080;
 
   std::shared_ptr<sf::RenderWindow> window =
-    std::make_shared<sf::RenderWindow>(sf::VideoMode(width, height),
+    std::make_shared<sf::RenderWindow>(sf::VideoMode::getFullscreenModes()[0],
                                        "Expecto Patronum",
                                        sf::Style::Fullscreen);
+  // std::shared_ptr<sf::RenderWindow> window =
+  //   std::make_shared<sf::RenderWindow>(sf::VideoMode(width, height),
+  //                                      "Expecto Patronum");
   window->setFramerateLimit(60);
   window->setKeyRepeatEnabled(false);
 

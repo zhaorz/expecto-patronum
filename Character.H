@@ -29,6 +29,7 @@ namespace Game {
   public:
 
     Character ( const sf::IntRect& bbox,
+                float ground,
                 const string& assetBasePath,
                 const string& pathToSprite,
                 const string& name,
@@ -41,7 +42,7 @@ namespace Game {
       , name(name)
       , nLives(3)
       , velocity(0.f, 0.f)
-      , ground(950.f)
+      , ground(ground)
       , isJumping(false)
       , isOpponent(isOpponent)
     {
