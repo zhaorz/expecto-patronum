@@ -99,6 +99,15 @@ namespace Game {
 
     }
 
+    void reset () {
+      nLives = 3;
+      sf::Vector2u heartSize = heartTexture.getSize();
+      heartSprite.setTextureRect(sf::IntRect(0, 0, nLives * heartSize.x, heartSize.y));
+
+      state = Idle;
+      sprite.setTexture(idleTexture);
+    }
+
     void setFont ( const sf::Font& font ) {
       nameText.setFont(font);
     }

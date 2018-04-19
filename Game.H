@@ -22,10 +22,18 @@ namespace Game {
 
   public:
 
+    enum Phase {
+      Loading,
+      Playing,
+      Complete,
+    };
+
     GameController( std::shared_ptr<sf::RenderWindow> window )
       : window(window)
       , width(window->getSize().x)
       , height(window->getSize().y)
+      , phase(Loading)
+      , loadingTimeout(loadingInterval)
       , ground(height * 0.9)
       , harry(sf::IntRect(0, 0, width / 2, height),
               ground,
@@ -41,7 +49,6 @@ namespace Game {
       , spellController(sf::IntRect(0.1 * width, 0.58 * height, 0.8 * width, 50),
                         assetBasePath)
       , wandDisplay(width / 2., height * 0.9)
-      , gameOver(false)
     {
       if ( !backgroundTexture.loadFromFile(assetBasePath + "chamber-of-secrets.png") ) {
         cout << "Error loading background texture" << endl;
@@ -83,6 +90,13 @@ namespace Game {
       gameOverText.setPosition(sf::Vector2f(width / 2. - textBounds.width / 2,
                                             height / 2. - textBounds.height / 2.));
 
+      countdownText.setString(std::to_string((int) std::ceil(loadingTimeout)));
+      countdownText.setFont(font);
+      countdownText.setCharacterSize(108);
+      textBounds = countdownText.getLocalBounds();
+      countdownText.setPosition(sf::Vector2f(width / 2. - textBounds.width / 2,
+                                             height / 2. - textBounds.height / 2.));
+
       cout << "Game : initialized, dimensions = " << width << "x" << height << endl;
     }
 
@@ -96,34 +110,69 @@ namespace Game {
 
       wandDisplay.draw(window);
 
-      if ( gameOver ) {
+      switch ( phase ) {
+
+      case Loading:
+        window->draw(countdownText);
+        break;
+
+      case Playing:
+        break;
+
+      case Complete:
         window->draw(gameOverText);
+        break;
+
       }
     }
 
     void update ( float elapsedTime ) {
       updateGameOver();
 
-      if ( !gameOver ) {
+      switch ( phase ) {
+
+      case Loading:
+        loadingTimeout -= elapsedTime;
+        countdownText.setString(std::to_string((int) std::ceil(loadingTimeout)));
+        if ( loadingTimeout < 0 ) {
+          phase = Playing;
+        }
+        break;
+
+      case Playing:
         harry.update(elapsedTime);
         voldemort.update(elapsedTime);
         voldemortController.update(elapsedTime);
         spellController.update(elapsedTime);
         wandDisplay.update(elapsedTime);
+        break;
+
+      case Complete:
+        break;
       }
     }
 
     void updateGameOver () {
       if ( !harry.alive() || !voldemort.alive() ) {
-        gameOver = true;
+        phase = Complete;
       }
     }
 
     void onMousePress() {
-      cout << "GameController : onMousePress" << endl;
+      if ( phase == Complete ) {
+        phase = Loading;
+
+        harry.reset();
+        voldemort.reset();
+        spellController.reset();
+
+        loadingTimeout = loadingInterval;
+      }
     }
 
     void onWandInput( Wand::Event& event ) {
+      if ( phase != Playing ) return;
+
       switch ( event.type ) {
 
       case Wand::Event::WandPoint:
@@ -160,6 +209,8 @@ namespace Game {
 
     std::shared_ptr<sf::RenderWindow> window;
 
+    Phase phase;
+
     int width;
     int height;
     float ground;               // Baseline of the characters
@@ -179,8 +230,11 @@ namespace Game {
 
     WandDisplay wandDisplay;
 
-    bool gameOver;
     sf::Text gameOverText;
+    sf::Text countdownText;
+
+    const float loadingInterval = 5.;
+    float loadingTimeout;
 
     // Shared assets
     sf::Font font;

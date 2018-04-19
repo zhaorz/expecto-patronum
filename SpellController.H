@@ -228,6 +228,12 @@ namespace Game {
       cout << "SpellController.castOpponentReflect" << endl;
     }
 
+    void reset () {
+      playerSpells.clear();
+      opponentSpells.clear();
+      explosions.clear();
+    }
+
     void update( float elapsedTime ) {
       auto it = playerSpells.begin();
       while (it != playerSpells.end()) {
