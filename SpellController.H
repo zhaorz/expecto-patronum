@@ -95,7 +95,7 @@ namespace Game {
 
   };
 
-  const sf::Vector2f Spell::speed = sf::Vector2f(1500.f, 0.f);
+  const sf::Vector2f Spell::speed = sf::Vector2f(2000.f, 0.f);
 
   class Explosion {
   public:

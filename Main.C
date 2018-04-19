@@ -3,6 +3,8 @@
 
 #include <SFML/Graphics.hpp>
 
+#include "cxxopts.hpp"
+
 #include "Game.H"
 #include "WandInput.H"
 
@@ -10,18 +12,35 @@
 using std::thread;
 
 
-int main()
+int main ( int argc, char** argv )
 {
+  cxxopts::Options options("Expecto Patronum", "Fight Voldemort");
+  options.add_options()
+    ("h,help", "Show help")
+    ("d,debug", "Enable debugging")
+    ;
+
+  auto args = options.parse(argc, argv);
+
+  bool debug = false;
+  if ( args.count("d") ) {
+    debug = true;
+    cout << "Debug enabled" << endl;
+  }
+
   int width = 1920;
   int height = 1080;
 
-  std::shared_ptr<sf::RenderWindow> window =
-    std::make_shared<sf::RenderWindow>(sf::VideoMode::getFullscreenModes()[0],
-                                       "Expecto Patronum",
-                                       sf::Style::Fullscreen);
-  // std::shared_ptr<sf::RenderWindow> window =
-  //   std::make_shared<sf::RenderWindow>(sf::VideoMode(width, height),
-  //                                      "Expecto Patronum");
+  std::shared_ptr<sf::RenderWindow> window;
+  if ( debug ) {
+    window = std::make_shared<sf::RenderWindow>(sf::VideoMode(width, height),
+                                                "Expecto Patronum");
+  } else {
+    window = std::make_shared<sf::RenderWindow>(sf::VideoMode::getFullscreenModes()[0],
+                                                "Expecto Patronum",
+                                                sf::Style::Fullscreen);
+  }
+
   window->setFramerateLimit(60);
   window->setKeyRepeatEnabled(false);
 

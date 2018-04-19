@@ -86,12 +86,6 @@ namespace Game {
 
       heartTexture.setRepeated(true); heartSprite.setTexture(heartTexture);
 
-      bboxShape.setPosition(position);
-      bboxShape.setSize(sf::Vector2f(bounds.width, bounds.height));
-      bboxShape.setFillColor(sf::Color(0, 0, 0, 0));
-      bboxShape.setOutlineThickness(5.f);
-      bboxShape.setOutlineColor(sf::Color(255, 0, 0, 255));
-
       // Game elements ------------------------------------------------------------------------------
 
       nameText.setString(name);
@@ -139,7 +133,6 @@ namespace Game {
         }
 
         sprite.setPosition(position);
-        bboxShape.setPosition(position);
         break;
 
       case Attack:
@@ -151,8 +144,8 @@ namespace Game {
         }
         break;
 
-      case Idle:
       case Dead:
+      case Idle:
         break;
       }
     }
@@ -186,9 +179,6 @@ namespace Game {
       window->draw(sprite);
       window->draw(nameText);
       window->draw(heartSprite);
-
-      // Debugging bbox
-      // window->draw(bboxShape);
     }
 
     void hit () {
@@ -196,9 +186,17 @@ namespace Game {
       sf::Vector2u heartSize = heartTexture.getSize();
       heartSprite.setTextureRect(sf::IntRect(0, 0, nLives * heartSize.x, heartSize.y));
 
-      state = Hit;
+      // Finish the fall if we're jumping
+      if ( state != Jump )
+        state = Hit;
+
       timeout = hitInterval;
       sprite.setTexture(hitTexture);
+
+      if ( nLives == 0 ) {
+        state = Dead;
+        sprite.setTexture(deadTexture);
+      }
     }
 
   private:
@@ -209,8 +207,6 @@ namespace Game {
     int bTop;
     int bWidth;
     int bHeight;
-
-    sf::RectangleShape bboxShape;
 
     // Title
     const string name;
