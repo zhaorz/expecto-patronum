@@ -12,11 +12,13 @@ using std::thread;
 
 int main()
 {
-  int width = 800;
-  int height = 600;
+  int width = 1920;
+  int height = 1080;
 
   std::shared_ptr<sf::RenderWindow> window =
-    std::make_shared<sf::RenderWindow>(sf::VideoMode(width, height), "Expecto Patronum");
+    std::make_shared<sf::RenderWindow>(sf::VideoMode(width, height),
+                                       "Expecto Patronum",
+                                       sf::Style::Fullscreen);
   window->setFramerateLimit(60);
   window->setKeyRepeatEnabled(false);
 
@@ -73,6 +75,11 @@ int main()
           syntheticEvent.type = Wand::Event::Reflect;
           break;
 
+        case sf::Keyboard::Q:
+          window->close();
+          exit(0);
+          break;
+
         default:
           break;
 
@@ -96,11 +103,8 @@ int main()
 
     window->clear();
 
-    std::cout << "drawing ..." << std::endl;
     game.draw();
-    std::cout << "updating ..." << std::endl;
     game.update(clock.getElapsedTime().asSeconds());
-    std::cout << "displaying ..." << std::endl;
     clock.restart();
 
     window->display();
