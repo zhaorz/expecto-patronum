@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.7)
 set (CMAKE_CXX_STANDARD 14)
-set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -pthread")
+set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O2 -pthread")
 project (patronus)
 
 message(STATUS "Architecture: ${ARCH}")
@@ -12,8 +12,8 @@ message(STATUS "    version: ${OpenCV_VERSION}")
 message(STATUS "    libraries: ${OpenCV_LIBRARIES}")
 message(STATUS "    include path: ${OpenCV_INCLUDE_DIRS}")
 
-add_executable( Patronus Patronus.C )
-target_link_libraries( Patronus ${OpenCV_LIBS} )
+# add_executable( Patronus Patronus.C )
+# target_link_libraries( Patronus ${OpenCV_LIBS} )
 
 # Main graphics
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake_modules")

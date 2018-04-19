@@ -61,7 +61,7 @@ namespace Wand {
       cap.set(CV_CAP_PROP_FRAME_WIDTH, 320);
       cap.set(CV_CAP_PROP_FRAME_HEIGHT, 240);
 
-      Mat frame, downsize, gray, blurred, clamped;
+      Mat frame, gray, blurred, clamped;
 
       for( ;; ) {
 
@@ -69,17 +69,13 @@ namespace Wand {
 
         cap >> frame; // get a new frame from camera
 
-        cout << "RawInput : frame dimension : " << frame.cols << "x" << frame.rows << endl;
-
-        resize(frame, downsize, Size(), scale, scale, CV_INTER_LINEAR);
-
-        cvtColor(downsize, gray, COLOR_BGR2GRAY);
+        cvtColor(frame, gray, COLOR_BGR2GRAY);
 
         // Apply a generous Gaussian blur
         GaussianBlur(gray, blurred, Size(15, 15), 0);
 
         // Apply a threshold to extract very bright pixels
-        threshold(blurred, clamped, 252, 255, THRESH_BINARY);
+        threshold(blurred, clamped, 240, 255, THRESH_BINARY);
 
         // Find contours
         vector< vector<Point> > contours;
@@ -98,7 +94,7 @@ namespace Wand {
             // if ( e < 0.8 ) {          // e = 0.8 corresponds to b = 0.6 * a
             if ( e < 0.85 ) {          // e = 0.8 corresponds to b = 0.7 * a
               // Flipping the x coordinate mirrors the movement
-              callback((downsize.cols - r.center.x) / downsize.cols, r.center.y / downsize.rows,
+              callback((frame.cols - r.center.x) / frame.cols, r.center.y / frame.rows,
                        std::chrono::duration_cast<ms>(Clock::now().time_since_epoch()).count());
             }
           }
@@ -108,6 +104,12 @@ namespace Wand {
 
         cout << "RawInput : frame processed ("
              << std::chrono::duration_cast<ms>(duration).count() << "ms)" << endl;
+
+        imwrite("frame.jpg", frame);
+        imwrite("blurred.jpg", blurred);
+        imwrite("clamped.jpg", clamped);
+
+        exit(1);
 
       }
 
