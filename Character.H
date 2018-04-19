@@ -28,10 +28,18 @@ namespace Game {
   class Character {
   public:
 
+    enum State {
+      Idle,
+      Jump,
+      Attack,
+      Hit,
+      Dead,
+    };
+
     Character ( const sf::IntRect& bbox,
                 float ground,
                 const string& assetBasePath,
-                const string& pathToSprite,
+                const string& spriteBasePath,
                 const string& name,
                 bool isOpponent = false )
       : bbox(bbox)
@@ -46,8 +54,12 @@ namespace Game {
       , isJumping(false)
       , isOpponent(isOpponent)
     {
-      if ( !texture.loadFromFile(pathToSprite) ) {
-        cout << "Error loading Character texture" << endl;
+      if ( !idleTexture.loadFromFile(spriteBasePath + "idle.png") ||
+           !jumpTexture.loadFromFile(spriteBasePath + "jump.png") ||
+           !attackTexture.loadFromFile(spriteBasePath + "attack.png") ||
+           !hitTexture.loadFromFile(spriteBasePath + "hit.png") ||
+           !deadTexture.loadFromFile(spriteBasePath + "dead.png") ) {
+        cout << "Error loading Character textures" << endl;
       }
 
       if ( !heartTexture.loadFromFile(assetBasePath + "heart.png") ) {
@@ -56,7 +68,8 @@ namespace Game {
 
       // Sprite initialization ----------------------------------------------------------------------
 
-      sprite.setTexture(texture);
+      state = Idle;
+      sprite.setTexture(idleTexture);
       sprite.scale(0.8, 0.8);
       auto rect = sprite.getTextureRect();
       auto bounds = sprite.getGlobalBounds();
@@ -198,8 +211,15 @@ namespace Game {
     function<void()> castAttack;
     function<void()> castReflect;
 
-    sf::Texture texture;
+    sf::Texture idleTexture;
+    sf::Texture jumpTexture;
+    sf::Texture attackTexture;
+    sf::Texture hitTexture;
+    sf::Texture deadTexture;
+
     sf::Sprite  sprite;
+
+    State state;
 
   };
 
