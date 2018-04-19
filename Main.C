@@ -18,6 +18,7 @@ int main ( int argc, char** argv )
   options.add_options()
     ("h,help", "Show help")
     ("d,debug", "Enable debugging")
+    ("s,small", "Use a small window")
     ;
 
   auto args = options.parse(argc, argv);
@@ -28,12 +29,21 @@ int main ( int argc, char** argv )
     cout << "Debug enabled" << endl;
   }
 
+  bool small = false;
+  if ( args.count("s") ) {
+    small = true;
+    cout << "Using small window" << endl;
+  }
+
   int width = 1920;
   int height = 1080;
 
   std::shared_ptr<sf::RenderWindow> window;
   if ( debug ) {
     window = std::make_shared<sf::RenderWindow>(sf::VideoMode(width, height),
+                                                "Expecto Patronum");
+  } else if ( small ) {
+    window = std::make_shared<sf::RenderWindow>(sf::VideoMode(800, 600),
                                                 "Expecto Patronum");
   } else {
     window = std::make_shared<sf::RenderWindow>(sf::VideoMode::getFullscreenModes()[0],

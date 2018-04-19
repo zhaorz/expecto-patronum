@@ -58,6 +58,9 @@ namespace Wand {
         exit(1);
       }
 
+      cap.set(CV_CAP_PROP_FRAME_WIDTH, 320);
+      cap.set(CV_CAP_PROP_FRAME_HEIGHT, 240);
+
       Mat frame, downsize, gray, blurred, clamped;
 
       for( ;; ) {
@@ -66,12 +69,14 @@ namespace Wand {
 
         cap >> frame; // get a new frame from camera
 
+        cout << "RawInput : frame dimension : " << frame.cols << "x" << frame.rows << endl;
+
         resize(frame, downsize, Size(), scale, scale, CV_INTER_LINEAR);
 
         cvtColor(downsize, gray, COLOR_BGR2GRAY);
 
         // Apply a generous Gaussian blur
-        GaussianBlur(gray, blurred, Size(69, 69), 0);
+        GaussianBlur(gray, blurred, Size(15, 15), 0);
 
         // Apply a threshold to extract very bright pixels
         threshold(blurred, clamped, 252, 255, THRESH_BINARY);

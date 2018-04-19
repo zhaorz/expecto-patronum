@@ -91,8 +91,14 @@ int main(int argc, char** argv)
   }
 
   VideoCapture cap(0); // Open the default camera
-  if(!cap.isOpened())
+  if(!cap.isOpened()) {
+    cout << "Failed to open camera" << endl;
     return -1;
+  }
+
+  cap.set(CV_CAP_PROP_FRAME_WIDTH, 320);
+  cap.set(CV_CAP_PROP_FRAME_HEIGHT, 240);
+
 
   namedWindow("Patronus", 1);
 
@@ -110,7 +116,10 @@ int main(int argc, char** argv)
   // cout << "Camera exposure   (after) : " << cap.get(CAP_PROP_EXPOSURE) << endl;
 
 
-  if ( debug ) namedWindow("Clamped", 1);
+  if ( debug ) {
+    namedWindow("Clamped", 1);
+    namedWindow("Blurred", 1);
+  }
 
   Mat frame, downsize, gray, blurred, clamped;
 
@@ -123,7 +132,9 @@ int main(int argc, char** argv)
     cvtColor(downsize, gray, COLOR_BGR2GRAY);
 
     // Apply a generous Gaussian blur
-    GaussianBlur(gray, blurred, Size(69, 69), 0);
+    GaussianBlur(gray, blurred, Size(15, 15), 0);
+
+    imshow("Blurred", blurred);
 
     // double thresh = thresholdValue( blurred );
 

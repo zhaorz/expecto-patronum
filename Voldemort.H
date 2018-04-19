@@ -48,9 +48,9 @@ namespace Game {
   private:
 
     static constexpr float jumpInterval = 10.f; // seconds
-    float jumpTimeout;
+    static constexpr float attackInterval = 10.f; // seconds
 
-    static constexpr float attackInterval = 3.f; // seconds
+    float jumpTimeout;
     float attackTimeout;
 
     function<void()> attackCb;
