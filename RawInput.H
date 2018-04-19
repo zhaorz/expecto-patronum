@@ -81,7 +81,7 @@ namespace Wand {
         GaussianBlur(gray, blurred, Size(15, 15), 0);
 
         // Apply a threshold to extract very bright pixels
-        threshold(blurred, clamped, 245, 255, THRESH_BINARY);
+        threshold(blurred, clamped, 235, 255, THRESH_BINARY);
 
         // pMOG->apply(clamped, fg);
 

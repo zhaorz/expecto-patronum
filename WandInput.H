@@ -59,8 +59,8 @@ namespace Wand {
 
     typedef pair<pair<double, double>, pair<double, double>> dxdyRange;
 
-    static const int analysisInterval = 50;    // Milliseconds
-    static const int analysisWindow = 300;     // Milliseconds
+    static const int analysisInterval = 100;    // Milliseconds
+    static const int analysisWindow = 500;     // Milliseconds
 
     static const unordered_map<Event::EventType, dxdyRange> analysisThresholds;
 
